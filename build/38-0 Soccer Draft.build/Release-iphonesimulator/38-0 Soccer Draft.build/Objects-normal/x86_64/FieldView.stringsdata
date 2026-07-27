@@ -1,0 +1,16 @@
+{
+  "source": "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/FieldView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 166
+        }
+      }
+    ]
+  },
+  "version": 1
+}

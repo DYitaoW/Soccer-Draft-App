@@ -2,7 +2,7 @@ import Foundation
 
 struct Chemistry {
     static func individual(player: Player, slotPosition: Position, manager: Manager?) -> Int {
-        if player.positions.contains(slotPosition) {
+        if player.canPlay(slotPosition) {
             var chem = 10
             if let manager = manager, manager.league == player.league {
                 chem = min(chem + 1, 10)

@@ -1,0 +1,184 @@
+{
+  "source": "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/GameView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Substitutes",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sub %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 337
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 320
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld remaining",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 432
+        }
+      },
+      {
+        "comment": "",
+        "key": "Complete",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 436
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your Manager",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to Reveal",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 536
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 544
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rating:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 519
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 521
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lineup Complete!",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 588
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reveal Manager",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 594
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start Season",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 607
+        }
+      },
+      {
+        "comment": "",
+        "key": "Season Simulation",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 686
+        }
+      },
+      {
+        "comment": "",
+        "key": "Error calculating season odds.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 727
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expected Finish",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 694
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expected Points",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 702
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 705
+        }
+      },
+      {
+        "comment": "",
+        "key": "Season Odds",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 712
+        }
+      },
+      {
+        "comment": "",
+        "key": "Play Season",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 732
+        }
+      },
+      {
+        "comment": "",
+        "key": "Back to Home",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 738
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 774
+        }
+      }
+    ]
+  },
+  "version": 1
+}

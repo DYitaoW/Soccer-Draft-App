@@ -20,6 +20,29 @@ struct GameView: View {
     @State private var managerRevealed = false
     @State private var swapSource: (isStarter: Bool, index: Int)? = nil
     @State private var showPlaySeason = false
+    @State private var showCupDraw = false
+    @State private var cupCompetitionType: CupCompetitionType?
+    @State private var cupResult: CupSeasonResult?
+    @State private var seasonResult: SeasonSimulationResult?
+    @AppStorage("enableCupCompetitions") private var enableCups = false
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var adaptiveOverlay: Color {
+        colorScheme == .dark ? Color.black.opacity(0.55) : Color.black.opacity(0.35)
+    }
+
+    private var adaptiveGray: Color {
+        Color(.systemGray5)
+    }
+
+    private var activeLeaguesText: String {
+        var parts: [String] = []
+        if gameState.showPremierLeague { parts.append("PL") }
+        if gameState.showOtherLeagues { parts.append("Other") }
+        if gameState.showGlobalSuperstars { parts.append("Stars") }
+        if gameState.showPastLegends { parts.append("Legends") }
+        return parts.isEmpty ? "None" : parts.joined(separator: " + ")
+    }
 
     private var dimmedIndices: Set<Int>? {
         guard let source = swapSource else { return nil }
@@ -28,10 +51,10 @@ struct GameView: View {
         else { player = gameState.substitutes[source.index] }
         guard let p = player else { return nil }
         let indices = Set(gameState.selectedFormation.slots.indices.compactMap { idx in
-            Chemistry.canPlay(player: p, at: gameState.selectedFormation.slots[idx].position) ? nil : idx
+            p.canPlay(gameState.selectedFormation.slots[idx].position) ? nil : idx
         })
         var result = indices
-        result.remove(source.index)
+        if source.isStarter { result.remove(source.index) }
         return result.isEmpty ? nil : result
     }
 
@@ -41,53 +64,153 @@ struct GameView: View {
     }
 
     var body: some View {
+        routingContent
+            .onAppear { handleAutoRoute() }
+    }
+
+    private func handleAutoRoute() {
+        if gameState.managerRevealed {
+            managerRevealed = true
+            if let mgr = gameState.selectedManager {
+                managerDisplayName = mgr.name
+            }
+        }
+        switch gameState.gamePhase {
+        case "lineComplete": phase = .lineComplete
+        case "seasonResults": phase = .seasonResults
+        case "playSeason": phase = .seasonResults
+        case "cupDraw":
+            if let raw = gameState.cupCompetitionTypeRaw,
+               let comp = CupCompetitionType(rawValue: raw) {
+                cupCompetitionType = comp
+            }
+            showCupDraw = true
+        default:
+            if gameState.isComplete && gameState.seasonOdds != nil {
+                phase = .seasonResults
+            } else if gameState.isComplete {
+                phase = .lineComplete
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var routingContent: some View {
         if showPlaySeason {
             PlaySeasonView(
-                playerTeam: gameState.playerTeam,
+                playerTeam: gameState.adjustedPlayerTeam,
                 projectedPosition: gameState.seasonOdds?.expectedPosition ?? 10,
+                isMode38: gameState.isMode38,
+                overall: Int(gameState.adjustedTeamRating.rounded()),
+                onRestart: onRestart,
+                onSeasonComplete: { result in
+                    seasonResult = result
+                    if enableCups {
+                        let pos = result.playerPosition
+                        if let comp = CupModels.determineCompetition(position: pos) {
+                            cupCompetitionType = comp
+                            gameState.cupCompetitionTypeRaw = comp.rawValue
+                            showPlaySeason = false
+                            showCupDraw = true
+                            gameState.gamePhase = "cupDraw"
+                            SavedGame.save(gameState)
+                            return
+                        }
+                    }
+                    if let st = result.playerStanding {
+                        let entry = DraftHistory(
+                            id: UUID(),
+                            date: Date(),
+                            gameMode: gameState.gameMode,
+                            teamOverall: Int(gameState.teamOvrWithChemistry.rounded()),
+                            record: SeasonRecord(wins: st.wins, draws: st.draws, losses: st.losses),
+                            position: result.playerPosition,
+                            formation: gameState.selectedFormation,
+                            assignedPlayers: gameState.assignedPlayers,
+                            substitutes: gameState.substitutes,
+                            manager: gameState.selectedManager
+                        )
+                        DraftHistory.save(entry)
+                    }
+                    SavedGame.clear()
+                    onRestart()
+                }
+            )
+        } else if showCupDraw, let cupType = cupCompetitionType {
+            let userNames = gameState.assignedPlayers.values.map { $0.name }
+            CupFlowView(
+                competitionType: cupType,
+                overall: Int(gameState.adjustedTeamRating.rounded()),
+                attack: Int(gameState.adjustedAttackRating.rounded()),
+                midfield: Int(gameState.adjustedMidfieldRating.rounded()),
+                defense: Int((gameState.adjustedDefenseRating + gameState.adjustedGkRating / 2.0).rounded()),
+                seasonResult: seasonResult,
+                userPlayerNames: userNames,
                 onRestart: onRestart
             )
         } else if phase == .seasonResults {
             SeasonResultView(
                 odds: gameState.seasonOdds,
                 onRestart: onRestart,
-                onPlaySeason: { showPlaySeason = true }
+                onPlaySeason: {
+                    showPlaySeason = true
+                    gameState.gamePhase = "playSeason"
+                    SavedGame.save(gameState)
+                }
             )
         } else if gameState.isMode38, phase == .drafting {
-            TeamDraftView()
-                .environmentObject(gameState)
+            TeamDraftView(onComplete: {
+                if !gameState.managerRevealed {
+                    gameState.selectedManager = GameData.managers.randomElement()
+                }
+                gameState.managerRevealed = true
+                gameState.simulateSeason()
+                withAnimation {
+                    phase = .seasonResults
+                    gameState.gamePhase = "seasonResults"
+                    SavedGame.save(gameState)
+                }
+            })
+            .environmentObject(gameState)
+            .navigationBarHidden(true)
+            .safeAreaInset(edge: .top) { topBar }
+        } else if gameState.isMode38 {
+            mode38LineCompleteView
                 .navigationBarHidden(true)
                 .safeAreaInset(edge: .top) { topBar }
         } else {
             mainBody
                 .navigationBarHidden(true)
-                .overlay { overlays }
+                .safeAreaInset(edge: .top) { topBar }
+                .overlay { randomizerOverlays }
+                .overlay { managerOverlay }
                 .animation(.easeOut(duration: 0.2), value: showRandomizer)
                 .animation(.easeOut(duration: 0.2), value: showSubRandomizer)
                 .animation(.easeOut(duration: 0.2), value: showManagerReveal)
-                .onChange(of: showRandomizer) {
-                    if phase == .drafting, gameState.isComplete {
-                        withAnimation { phase = .lineComplete }
+                    .onChange(of: showRandomizer) {
+                        if phase == .drafting, gameState.isComplete {
+                            withAnimation {
+                                phase = .lineComplete
+                                gameState.gamePhase = "lineComplete"
+                                SavedGame.save(gameState)
+                            }
+                        }
                     }
-                }
         }
     }
 
     // MARK: - Main Layout
 
     private var mainBody: some View {
-        VStack(spacing: 0) {
-            topBar
-            ScrollView {
-                VStack(spacing: 8) {
-                    if phase == .drafting {
-                        draftingContent
-                    } else {
-                        lineCompleteContent
-                    }
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 8) {
+                if phase == .drafting {
+                    draftingContent
+                } else {
+                    lineCompleteContent
                 }
-                .padding(.horizontal, 8)
             }
+            .padding(.horizontal, 8)
         }
     }
 
@@ -111,8 +234,7 @@ struct GameView: View {
                 defense: gameState.defenseRating,
                 gk: gameState.gkRating,
                 teamOvr: gameState.teamRating,
-                chemistryModifier: gameState.chemistryModifier,
-                chemistry: gameState.teamChemistry
+                manager: gameState.selectedManager
             )
         }
     }
@@ -136,8 +258,7 @@ struct GameView: View {
                 defense: gameState.defenseRating,
                 gk: gameState.gkRating,
                 teamOvr: gameState.teamRating,
-                chemistryModifier: gameState.chemistryModifier,
-                chemistry: gameState.teamChemistry
+                manager: gameState.selectedManager
             )
 
             completionSection
@@ -167,20 +288,21 @@ struct GameView: View {
     }
 
     private func subRowContent(onTap: @escaping (Int) -> Void) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 0) {
             Text("Substitutes")
-                .font(.caption.weight(.semibold))
+                .font(.system(size: 18).weight(.bold))
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
+                HStack(spacing: 12) {
                     ForEach(0..<gameState.substitutes.count, id: \.self) { i in
                         subCircle(index: i, onTap: { onTap(i) })
                     }
                 }
                 .padding(.horizontal, 16)
+                .padding(.top, 5)
             }
             .frame(height: 80)
         }
@@ -193,9 +315,9 @@ struct GameView: View {
         return VStack(spacing: 2) {
             ZStack {
                 Circle()
-                    .fill(isSwapSource ? Color.white.opacity(0.6) : player != nil ? Color.blue : Color.black.opacity(0.15))
+                    .fill(isSwapSource ? Color.white.opacity(0.6) : player != nil ? player!.positions.first!.categoryColor : Color.black.opacity(0.15))
                     .frame(width: 50, height: 50)
-                    .overlay(Circle().stroke(isSwapSource ? Color.white : player != nil ? Color.blue : Color.gray.opacity(0.4), lineWidth: isSwapSource ? 3 : 2))
+                    .overlay(Circle().stroke(isSwapSource ? Color.white : player != nil ? player!.positions.first!.categoryColor : Color.gray.opacity(0.4), lineWidth: isSwapSource ? 3 : 2))
 
                 if let player = player {
                     Text("\(player.ovrRating)")
@@ -228,51 +350,64 @@ struct GameView: View {
     // MARK: - Overlays
 
     @ViewBuilder
-    private var overlays: some View {
+    private var randomizerOverlays: some View {
         if showRandomizer {
-            Color.black.opacity(0.45)
+            adaptiveOverlay
                 .ignoresSafeArea()
                 .onTapGesture { showRandomizer = false }
 
             PlayerRandomizerView(
                 position: editingSlotPosition,
-                league: gameState.selectedLeague,
-                allPlayers: SampleData.players,
+                allPlayers: GameData.players,
                 excludedIds: gameState.usedPlayerIds,
-                maxRerolls: gameState.maxRerolls,
-                hardMode: gameState.gameMode == .hard,
+                maxRerolls: gameState.totalRerollsRemaining,
+                showRatings: gameState.showRatings,
+                showPremierLeague: gameState.showPremierLeague,
+                showOtherLeagues: gameState.showOtherLeagues,
+                showGlobalSuperstars: gameState.showGlobalSuperstars,
+                showPastLegends: gameState.showPastLegends,
                 onSelect: { player in
                     gameState.assignPlayer(player, toSlot: editingSlotIndex)
+                    SavedGame.save(gameState)
                     withAnimation { showRandomizer = false }
                 },
-                onCancel: { showRandomizer = false }
+                onCancel: { showRandomizer = false },
+                onReroll: { gameState.useReroll() }
             )
             .transition(.scale(scale: 0.85).combined(with: .opacity))
         }
 
         if showSubRandomizer {
-            Color.black.opacity(0.45)
+            adaptiveOverlay
                 .ignoresSafeArea()
                 .onTapGesture { showSubRandomizer = false }
 
             PlayerRandomizerView(
                 position: nil,
-                league: gameState.selectedLeague,
-                allPlayers: SampleData.players,
+                allPlayers: GameData.players,
                 excludedIds: gameState.usedPlayerIds,
-                maxRerolls: gameState.maxRerolls,
-                hardMode: gameState.gameMode == .hard,
+                maxRerolls: gameState.totalRerollsRemaining,
+                showRatings: gameState.showRatings,
+                showPremierLeague: gameState.showPremierLeague,
+                showOtherLeagues: gameState.showOtherLeagues,
+                showGlobalSuperstars: gameState.showGlobalSuperstars,
+                showPastLegends: gameState.showPastLegends,
                 onSelect: { player in
                     gameState.addSubstitute(player, at: editingSubIndex)
+                    SavedGame.save(gameState)
                     withAnimation { showSubRandomizer = false }
                 },
-                onCancel: { showSubRandomizer = false }
+                onCancel: { showSubRandomizer = false },
+                onReroll: { gameState.useReroll() }
             )
             .transition(.scale(scale: 0.85).combined(with: .opacity))
         }
+    }
 
+    @ViewBuilder
+    private var managerOverlay: some View {
         if showManagerReveal {
-            Color.black.opacity(0.45)
+            adaptiveOverlay
                 .ignoresSafeArea()
 
             managerRevealCard
@@ -283,72 +418,57 @@ struct GameView: View {
     // MARK: - Top Bar
 
     private var topBar: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 2) {
             HStack {
                 Button(action: onRestart) {
                     Image(systemName: "house")
-                        .font(.body)
+                        .font(.callout.weight(.bold))
                 }
                 .foregroundColor(.primary)
 
                 Text(gameState.selectedFormation.name)
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(.title3.weight(.bold))
 
-                if gameState.isMode38, gameState.isComplete, phase == .drafting {
-                    Spacer()
-                    Button("Continue") {
-                        phase = .lineComplete
-                    }
-                    .buttonStyle(.borderedProminent).controlSize(.small)
-                } else {
-                    Spacer()
-                    if phase == .drafting {
-                        Text("\(gameState.totalRemaining) remaining")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("Complete")
-                            .font(.subheadline)
-                            .foregroundColor(.green)
-                    }
-                }
-            }
-
-            HStack {
-                if let manager = gameState.selectedManager {
-                    Image(systemName: "person.fill")
-                        .font(.caption)
-                    Text(manager.name)
-                        .font(.subheadline)
-                }
                 Spacer()
-                Text(gameState.selectedLeague)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(.systemGray6))
-                    .clipShape(Capsule())
-            }
-            .foregroundColor(.secondary)
+
+                if phase == .drafting {
+                    Text("\(gameState.totalRemaining) remaining")
+                        .font(.system(size: 15).weight(.bold))
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("Complete")
+                        .font(.system(size: 15).weight(.bold))
+                        .foregroundColor(.green)
+                }
+            }.padding(.bottom, 5)
+
+            
         }
-        .padding()
+        .padding(.horizontal, 12)
+        .padding(.vertical, 0)
         .background(.ultraThinMaterial)
     }
 
     // MARK: - Swap Logic
 
     private func handleStarterTap(index: Int) {
-        guard gameState.assignedPlayers[index] != nil else { return }
+        guard let tappedPlayer = gameState.assignedPlayers[index] else { return }
 
         if let source = swapSource {
             if source.isStarter && source.index == index {
                 swapSource = nil
             } else if source.isStarter {
-                gameState.swapStarterWithStarter(source.index, to: index)
+                guard let fromPlayer = gameState.assignedPlayers[source.index] else { swapSource = nil; return }
+                let toPosition = gameState.selectedFormation.slots[index].position
+                let fromPosition = gameState.selectedFormation.slots[source.index].position
+                if fromPlayer.canPlay(toPosition) && tappedPlayer.canPlay(fromPosition) {
+                    gameState.swapStarterWithStarter(source.index, to: index)
+                    SavedGame.save(gameState)
+                }
                 swapSource = nil
             } else {
                 gameState.swapStarter(index, withSub: source.index)
+                SavedGame.save(gameState)
                 swapSource = nil
             }
         } else {
@@ -362,9 +482,11 @@ struct GameView: View {
                 swapSource = nil
             } else if source.isStarter {
                 gameState.swapStarter(source.index, withSub: index)
+                SavedGame.save(gameState)
                 swapSource = nil
             } else {
                 gameState.swapSub(source.index, withSub: index)
+                SavedGame.save(gameState)
                 swapSource = nil
             }
         } else {
@@ -381,21 +503,20 @@ struct GameView: View {
 
             if managerRevealed, let mgr = gameState.selectedManager {
                 VStack(spacing: 8) {
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.blue)
-                    Text(mgr.name)
-                        .font(.title3).fontWeight(.semibold)
+                   /* Text(mgr.name)
+                        .font(.title3).fontWeight(.semibold) */
                     HStack(spacing: 4) {
-                        Text("Rating:")
-                            .foregroundColor(.secondary)
-                        Text("\(mgr.rating)")
+                        Text(mgr.name)
+                            .font(.title3).fontWeight(.semibold)
+                       // Text("Rating:")
+                       //     .foregroundColor(.secondary)
+                        Text("  (\(mgr.rating))")
                             .fontWeight(.bold)
                             .foregroundColor(.yellow)
                     }
-                    Text(mgr.league)
+                /*    Text(mgr.league)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.secondary) */
                 }
             } else {
                 Text(managerDisplayName)
@@ -404,37 +525,56 @@ struct GameView: View {
             }
 
             if !managerRevealed && !managerAnimating {
-                Button("Tap to Reveal") {
+                Button(action: {
                     startManagerReveal()
+                }) {
+                    Text("Reveal Manager")
+                       // .frame(maxWidth: .infinity)
+                        .font(.headline.weight(.bold))
                 }
                 .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle(radius: 10))
                 .controlSize(.large)
+                .tint(.green)
+                .padding(.horizontal)
             }
 
             if managerRevealed {
                 Button("Done") {
                     showManagerReveal = false
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle(radius: 10))
+               // .frame(maxWidth: .infinity)
                 .controlSize(.large)
+                .tint(.green)
+                .padding(.horizontal)
             }
         }
-        .padding(32)
+        .padding(25)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.2), radius: 20)
-        .padding(32)
+        .padding(25)
     }
 
     private func startManagerReveal() {
         managerAnimating = true
         managerRevealed = false
-        let pool = gameState.selectedLeague == "All"
-            ? SampleData.managers
-            : SampleData.managers.filter { $0.league == gameState.selectedLeague }
+        let pool = GameData.managers
         guard !pool.isEmpty else { return }
 
         let finalMgr = pool.randomElement()!
+
+        guard !UserDefaults.standard.bool(forKey: "fastMode") else {
+            managerDisplayName = finalMgr.name
+            managerAnimating = false
+            managerRevealed = true
+            gameState.managerRevealed = true
+            gameState.selectedManager = finalMgr
+            SavedGame.save(gameState)
+            return
+        }
 
         var count = 0
         func cycle() {
@@ -442,7 +582,9 @@ struct GameView: View {
                 managerDisplayName = finalMgr.name
                 managerAnimating = false
                 managerRevealed = true
+                gameState.managerRevealed = true
                 gameState.selectedManager = finalMgr
+                SavedGame.save(gameState)
                 return
             }
             managerDisplayName = pool.randomElement()?.name ?? "???"
@@ -454,57 +596,100 @@ struct GameView: View {
 
     // MARK: - Completion Section
 
-    private var completionSection: some View {
-        VStack(spacing: 16) {
-            Text("Lineup Complete!")
+    private var completionContent: some View {
+        VStack(spacing: 10) {
+            Text("Squad Complete!")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top, 8)
 
             if !managerRevealed {
-                Button("Reveal Manager") {
+                Button(action: {
                     withAnimation { showManagerReveal = true }
+                }) {
+                    Text("Reveal Manager")
+                        .frame(maxWidth: .infinity)
+                        .font(.headline.weight(.bold))
                 }
                 .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle(radius: 10))
                 .controlSize(.large)
-            }
-
-            if managerRevealed, let manager = gameState.selectedManager {
-                HStack(spacing: 12) {
-                    Image(systemName: "person.circle.fill")
-                        .font(.title)
-                        .foregroundColor(.blue)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(manager.name)
-                            .font(.headline)
-                        HStack(spacing: 4) {
-                            Text("Rating:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text("\(manager.rating)")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.yellow)
-                        }
-                    }
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .tint(.green)
                 .padding(.horizontal)
-
-                Button("Start Season") {
-                    gameState.simulateSeason()
-                    withAnimation { phase = .seasonResults }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
             }
 
             Spacer()
         }
         .padding(.bottom)
-        .background(.ultraThinMaterial)
+    }
+
+    private var completionButton: some View {
+        Button(action: {
+            gameState.simulateSeason()
+            withAnimation {
+                phase = .seasonResults
+                gameState.gamePhase = "seasonResults"
+                SavedGame.save(gameState)
+            }
+        }) {
+            Text("Start Season")
+                .frame(maxWidth: .infinity)
+                .font(.headline.weight(.bold))
+        }
+        .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.roundedRectangle(radius: 10))
+        .controlSize(.large)
+        .tint(.green)
+        .padding(.horizontal)
+    }
+
+    private var completionSection: some View {
+        VStack(spacing: 16) {
+            completionContent
+            if managerRevealed {
+                completionButton
+            }
+            Spacer()
+        }
+        .padding(.bottom)
+    }
+
+    private var mode38LineCompleteView: some View {
+        VStack(spacing: 0) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 8) {
+                    FieldView(
+                        formation: gameState.selectedFormation,
+                        assignedPlayers: gameState.assignedPlayers,
+                        onEmptySlotTap: { _, _ in },
+                        onFilledSlotTap: nil,
+                        highlightedIndex: nil,
+                        dimmedIndices: nil
+                    )
+
+                    TeamStatsView(
+                        attack: gameState.attackRating,
+                        midfield: gameState.midfieldRating,
+                        defense: gameState.defenseRating,
+                        gk: gameState.gkRating,
+                        teamOvr: gameState.teamRating,
+                        manager: gameState.selectedManager,
+                        isMode38: true
+                    )
+
+                    completionContent
+                }
+                .padding(.horizontal, 8)
+            }
+
+            if managerRevealed {
+                completionButton
+                    .padding(.bottom, 8)
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .overlay { managerOverlay }
+        .animation(.easeOut(duration: 0.2), value: showManagerReveal)
     }
 }
 
@@ -514,14 +699,19 @@ struct SeasonResultView: View {
     let odds: SeasonOdds?
     let onRestart: () -> Void
     let onPlaySeason: () -> Void
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var adaptiveGray6: Color {
+        Color(.systemGray6)
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                Text("Season Simulation")
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 30) {
+                Text("Season Prediction")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .padding(.top, 32)
+                    .padding(.top, 45)
 
                 if let odds = odds {
                     HStack(spacing: 32) {
@@ -543,19 +733,19 @@ struct SeasonResultView: View {
                         }
                     }
 
-                    VStack(spacing: 16) {
+                    VStack(spacing: 20) {
                         Text("Season Odds")
                             .font(.title2)
-                            .fontWeight(.semibold)
+                            .fontWeight(.bold)
 
                         OutcomeRow(label: "Win Title", pct: odds.winTitle, color: .yellow)
-                        OutcomeRow(label: "Top 4", pct: odds.top4, color: .green)
-                        OutcomeRow(label: "Top 8", pct: odds.top8, color: .blue)
+                        OutcomeRow(label: "Top 4 (2-4)", pct: odds.top4, color: .green)
+                        OutcomeRow(label: "Top 8 (5-8)", pct: odds.top8, color: .blue)
                         OutcomeRow(label: "Mid Table (9-17)", pct: odds.midTable, color: .orange)
                         OutcomeRow(label: "Relegation (18-20)", pct: odds.relegation, color: .red)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(adaptiveGray6)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .padding(.horizontal)
                 } else {
@@ -563,18 +753,43 @@ struct SeasonResultView: View {
                         .foregroundColor(.secondary)
                 }
 
-                VStack(spacing: 12) {
-                    Button("Play Season") {
+                VStack(spacing: 15) {
+                    Button(action: {
                         onPlaySeason()
+                    }) {
+                        Text("Play Upcoming Season")
+                            .frame(maxWidth: .infinity)
+                            .font(.headline.weight(.bold))
                     }
                     .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: 10))
                     .controlSize(.large)
+                    .tint(.green)
+                    .padding(.horizontal)
 
-                    Button("Back to Home", action: onRestart)
+                    
+                    Button(action: {
+                        onRestart()
+                    }) {
+                        Text("Back to Home")
+                            .frame(maxWidth: .infinity)
+                            .font(.headline.weight(.bold))
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.roundedRectangle(radius: 10))
+                 //   .controlSize(.s)
+                    .tint(.gray)
+                   // .tint(.green)
+                    .padding(.horizontal)
+                  // .padding(.bottom, 10)
+                    /*Button("Back to Home", action: onRestart)
                         .buttonStyle(.bordered)
                         .controlSize(.large)
+                        .padding(.horizontal)
+                        .buttonBorderShape(.roundedRectangle(radius: 10))
+                        . */
                 }
-                .padding(.top, 8)
+                .padding(.top, 20)
             }
             .padding()
         }
@@ -594,13 +809,22 @@ struct SeasonResultView: View {
     }
 }
 
+#Preview("SeasonResultView") {
+    SeasonResultView(
+        odds: SeasonOdds(winTitle: 8, top4: 22, top8: 35, midTable: 28, relegation: 7, expectedPoints: 62, expectedPosition: 8),
+        onRestart: {},
+        onPlaySeason: {}
+    )
+}
+
 struct OutcomeRow: View {
     let label: String
     let pct: Int
     let color: Color
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 10) {
             HStack {
                 Text(label)
                     .font(.subheadline)
@@ -614,20 +838,59 @@ struct OutcomeRow: View {
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color(.systemGray5))
-                        .frame(height: 8)
+                        .frame(height: 15)
                     RoundedRectangle(cornerRadius: 4)
                         .fill(color)
-                        .frame(width: max(0, geo.size.width * CGFloat(pct) / 100), height: 8)
+                        .frame(width: max(0, geo.size.width * CGFloat(pct) / 100), height: 15)
                 }
             }
-            .frame(height: 8)
+            .frame(height: 10)
         }
     }
 }
 
-#Preview {
-    let gs = GameState(formation: SampleData.formations[0])
-    gs.selectedManager = SampleData.managers[0]
+#Preview("OutcomeRow") {
+    OutcomeRow(label: "Win Title", pct: 45, color: .yellow)
+        .padding()
+}
+
+#Preview("Lineup Complete") {
+    let gs = GameState(formation: GameData.formations[0])
+    gs.selectedManager = GameData.managers[0]
+    let formation = GameData.formations[0]
+    for (i, slot) in formation.slots.enumerated() {
+        gs.assignedPlayers[i] = Player(
+            name: "Player \(i + 1)", ovrRating: 88 - i,
+            positions: [slot.position],
+            team: "Your Team", league: "Premier League"
+        )
+    }
+    gs.substitutes[0] = Player(name: "Sub GK", ovrRating: 80, positions: [.GK], team: "Your Team", league: "Premier League")
+    gs.substitutes[1] = Player(name: "Sub DEF", ovrRating: 78, positions: [.CB], team: "Your Team", league: "Premier League")
+    gs.substitutes[2] = Player(name: "Sub MID", ovrRating: 76, positions: [.CM], team: "Your Team", league: "Premier League")
+    return GameView(onRestart: {})
+        .environmentObject(gs)
+}
+
+#Preview("Season Result") {
+    let gs = GameState(formation: GameData.formations[0])
+    gs.selectedManager = GameData.managers[0]
+    let formation = GameData.formations[0]
+    for (i, slot) in formation.slots.enumerated() {
+        gs.assignedPlayers[i] = Player(
+            name: "Player \(i + 1)", ovrRating: 88 - i,
+            positions: [slot.position],
+            team: "Your Team", league: "Premier League"
+        )
+    }
+    gs.seasonOdds = SeasonOdds(winTitle: 8, top4: 22, top8: 35, midTable: 28, relegation: 7, expectedPoints: 62, expectedPosition: 8)
+    return GameView(onRestart: {})
+        .environmentObject(gs)
+}
+
+#Preview("Drafting") {
+    let gs = GameState(formation: GameData.formations[0])
+    gs.selectedManager = GameData.managers[0]
     return GameView(onRestart: {})
         .environmentObject(gs)
 }

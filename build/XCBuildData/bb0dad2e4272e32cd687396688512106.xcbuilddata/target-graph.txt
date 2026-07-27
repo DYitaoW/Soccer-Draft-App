@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target '38-0 Soccer Draft' in project '38-0 Soccer Draft' (no dependencies)

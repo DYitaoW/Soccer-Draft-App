@@ -1,0 +1,12 @@
+{
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Data/GameData.swift" : {
+    "abi-baseline-json" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/_8_0_Soccer_Draft.abi.json",
+    "const-values" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.swiftconstvalues",
+    "dependencies" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.d",
+    "diagnostics" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.dia",
+    "objc-header" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/_8_0_Soccer_Draft-Swift.h",
+    "swiftdoc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/_8_0_Soccer_Draft.swiftdoc",
+    "swiftmodule" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/_8_0_Soccer_Draft.swiftmodule",
+    "swiftsourceinfo" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/_8_0_Soccer_Draft.swiftsourceinfo"
+  }
+}

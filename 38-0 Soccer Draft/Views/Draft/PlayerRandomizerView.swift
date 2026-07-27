@@ -2,13 +2,17 @@ import SwiftUI
 
 struct PlayerRandomizerView: View {
     let position: Position?
-    let league: String
     let allPlayers: [Player]
     let excludedIds: Set<UUID>
     let maxRerolls: Int
-    let hardMode: Bool
+    let showRatings: Bool
+    let showPremierLeague: Bool
+    let showOtherLeagues: Bool
+    let showGlobalSuperstars: Bool
+    let showPastLegends: Bool
     let onSelect: (Player) -> Void
     let onCancel: () -> Void
+    let onReroll: () -> Void
 
     @State private var finalCandidates: [Player] = []
     @State private var displayNames: [String] = Array(repeating: "", count: 5)
@@ -21,10 +25,16 @@ struct PlayerRandomizerView: View {
     private var pool: [Player] {
         var f = allPlayers.filter { !excludedIds.contains($0.id) }
         if let pos = position {
-            f = f.filter { $0.positions.contains(pos) }
+            f = f.filter { $0.canPlay(pos) }
         }
-        if league != "All" {
-            f = f.filter { $0.league == league }
+        f = f.filter { player in
+            switch player.league {
+            case "Premier League": return showPremierLeague
+            case "Other Leagues": return showOtherLeagues
+            case "Global Superstars": return showGlobalSuperstars
+            case "Past Legends": return showPastLegends
+            default: return true
+            }
         }
         return f
     }
@@ -35,9 +45,6 @@ struct PlayerRandomizerView: View {
         VStack(spacing: 14) {
             Text(position != nil ? "Select \(position!.rawValue)" : "Select Substitute")
                 .font(.title2).fontWeight(.bold)
-            Text(league == "All" ? "All Leagues" : league)
-                .font(.subheadline).foregroundColor(.secondary)
-
             if pool.isEmpty {
                 Text("No eligible players available")
                     .foregroundColor(.secondary)
@@ -47,15 +54,13 @@ struct PlayerRandomizerView: View {
             }
 
             HStack(spacing: 16) {
-                Button("Cancel", action: onCancel)
-                    .buttonStyle(.bordered)
-
                 if animationDone && rerollsLeft > 0 && !pool.isEmpty {
                     Button("Re-roll (\(rerollsLeft))") { reroll() }
                         .buttonStyle(.borderedProminent)
                 }
             }
         }
+        .frame(maxWidth: 340)
         .padding(24)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -68,7 +73,7 @@ struct PlayerRandomizerView: View {
     private func candidateSlot(_ i: Int) -> some View {
         if i < finalCandidates.count, slotLocked[i] {
             Button { onSelect(finalCandidates[i]) } label: {
-                PlayerCard(player: finalCandidates[i], hardMode: hardMode)
+                PlayerCard(player: finalCandidates[i], showRatings: showRatings)
             }
             .buttonStyle(.plain)
         } else if i < finalCandidates.count {
@@ -110,23 +115,14 @@ struct PlayerRandomizerView: View {
                 Text("???")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                Text(league == "All" ? "All Leagues" : league)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
 
             Spacer()
 
             VStack(alignment: .trailing, spacing: 2) {
-                if hardMode {
-                    Text("??")
-                        .font(.title2).fontWeight(.bold)
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("???")
-                        .font(.title2).fontWeight(.bold)
-                        .foregroundColor(.secondary)
-                }
+                Text("???")
+                    .font(.title2).fontWeight(.bold)
+                    .foregroundColor(.secondary)
                 Text(position?.rawValue ?? "SUB")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -149,6 +145,16 @@ struct PlayerRandomizerView: View {
         animationDone = false
         animationId += 1
         let currentId = animationId
+
+        guard !UserDefaults.standard.bool(forKey: "fastMode") else {
+            for slot in 0..<finalCandidates.count {
+                displayNames[slot] = finalCandidates[slot].name
+                slotLocked[slot] = true
+            }
+            revealedSlots = finalCandidates.count
+            animationDone = true
+            return
+        }
 
         for slot in 0..<finalCandidates.count {
             startCycling(slot: slot, id: currentId)
@@ -182,6 +188,7 @@ struct PlayerRandomizerView: View {
 
     private func reroll() {
         rerollsUsed += 1
+        onReroll()
         pickCandidates()
         startAnimation()
     }
@@ -189,7 +196,7 @@ struct PlayerRandomizerView: View {
 
 struct PlayerCard: View {
     let player: Player
-    let hardMode: Bool
+    let showRatings: Bool
 
     var body: some View {
         HStack(spacing: 12) {
@@ -199,22 +206,19 @@ struct PlayerCard: View {
                 Text(player.team)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                Text(player.league)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
 
             Spacer()
 
             VStack(alignment: .trailing, spacing: 2) {
-                if hardMode {
-                    Text("??")
-                        .font(.title2).fontWeight(.bold)
-                        .foregroundColor(.secondary)
-                } else {
+                if showRatings {
                     Text("\(player.ovrRating)")
                         .font(.title2).fontWeight(.bold)
                         .foregroundColor(.blue)
+                } else {
+                    Text("??")
+                        .font(.title2).fontWeight(.bold)
+                        .foregroundColor(.secondary)
                 }
                 Text(player.positions.map(\.rawValue).joined(separator: "/"))
                     .font(.caption)
@@ -227,16 +231,38 @@ struct PlayerCard: View {
     }
 }
 
-#Preview {
+#Preview("ST - Full Pools") {
     PlayerRandomizerView(
         position: .ST,
-        league: "All",
-        allPlayers: SampleData.players,
+        allPlayers: GameData.players,
         excludedIds: [],
         maxRerolls: 3,
-        hardMode: false,
+        showRatings: true,
+        showPremierLeague: true,
+        showOtherLeagues: true,
+        showGlobalSuperstars: true,
+        showPastLegends: true,
         onSelect: { _ in },
-        onCancel: {}
+        onCancel: {},
+        onReroll: {}
+    )
+    .padding()
+}
+
+#Preview("GK - No Rerolls") {
+    PlayerRandomizerView(
+        position: .GK,
+        allPlayers: GameData.players,
+        excludedIds: [],
+        maxRerolls: 0,
+        showRatings: true,
+        showPremierLeague: true,
+        showOtherLeagues: false,
+        showGlobalSuperstars: false,
+        showPastLegends: false,
+        onSelect: { _ in },
+        onCancel: {},
+        onReroll: {}
     )
     .padding()
 }

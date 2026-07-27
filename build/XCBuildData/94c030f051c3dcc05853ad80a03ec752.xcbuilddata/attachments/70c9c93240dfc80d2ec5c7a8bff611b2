@@ -1,0 +1,166 @@
+{
+  "" : {
+    "const-values" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.swiftconstvalues",
+    "dependencies" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.d",
+    "diagnostics" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.dia",
+    "emit-module-dependencies" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary-emit-module.dia",
+    "pch" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/38-0 Soccer Draft-primary.swiftdeps"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/ContentView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/ContentView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/ContentView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/ContentView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Data/GameData.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameData.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameData.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameData.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Data/Players.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Players.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Players.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Players.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Data/Teams.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Teams.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Teams.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Teams.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/CareerStats.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStats.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStats.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStats.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Chemistry.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Chemistry.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Chemistry.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Chemistry.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/CupModels.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupModels.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupModels.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupModels.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/DraftHistory.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistory.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistory.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistory.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Formation.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Formation.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Formation.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Formation.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/GameState.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameState.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameState.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameState.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Manager.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Manager.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Manager.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Manager.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Player.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Player.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Player.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Player.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Position.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Position.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Position.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Position.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/SeasonOdds.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/SeasonOdds.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/SeasonOdds.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/SeasonOdds.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Models/Team.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Team.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Team.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Team.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Soccer_DraftApp.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Soccer_DraftApp.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Soccer_DraftApp.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/Soccer_DraftApp.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Draft/PlayerRandomizerView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlayerRandomizerView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlayerRandomizerView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlayerRandomizerView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Draft/TeamDraftView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamDraftView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamDraftView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamDraftView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupDrawView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupDrawView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupDrawView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupDrawView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupEndView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupEndView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupEndView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupEndView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupFlowView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupFlowView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupFlowView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupFlowView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupKnockoutView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupKnockoutView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupKnockoutView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupKnockoutView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupSeasonView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupSeasonView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupSeasonView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CupSeasonView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/FieldView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/FieldView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/FieldView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/FieldView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/GameView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GameView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/PlaySeasonView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlaySeasonView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlaySeasonView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/PlaySeasonView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/TeamStatsView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamStatsView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamStatsView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/TeamStatsView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Home/HomeView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/HomeView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/HomeView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/HomeView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Stats/CareerStatsView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStatsView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStatsView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/CareerStatsView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Stats/DraftHistoryView.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistoryView.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistoryView.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/DraftHistoryView.o"
+  },
+  "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/build/38-0 Soccer Draft.build/Release-iphonesimulator/38-0 Soccer Draft.build/Objects-normal/x86_64/GeneratedAssetSymbols.o"
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "source": "/Users/dylanwang/Desktop/CSProjects/SoccerDraftGame/38-0 Soccer Draft/38-0 Soccer Draft/Views/Game/CupKnockoutView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Your opponent is set!",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "Drawing opponent...",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your Team",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "vs",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "Final",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "First Leg",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "Second Leg",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "Play Match",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 281
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld'",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "(P)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": "Extra Time",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 345
+        }
+      },
+      {
+        "comment": "",
+        "key": "vs",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 317
+        }
+      },
+      {
+        "comment": "",
+        "key": "Agg: %lld-%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 324
+        }
+      },
+      {
+        "comment": "",
+        "key": "✓ %@ advances",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 329
+        }
+      },
+      {
+        "comment": "",
+        "key": "✓ %@ advances",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 332
+        }
+      },
+      {
+        "comment": "",
+        "key": "Extra Time / Pens",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 335
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 362
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %lld - %lld %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 407
+        }
+      },
+      {
+        "comment": "",
+        "key": "Second Leg coming up...",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 411
+        }
+      },
+      {
+        "comment": "",
+        "key": "Full Time Result",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 405
+        }
+      },
+      {
+        "comment": "",
+        "key": "First Leg Result",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 405
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 414
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue to Next Round",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 447
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Full Results",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "Final Score",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "Penalties: %lld-%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 503
+        }
+      },
+      {
+        "comment": "",
+        "key": "After Extra Time",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 506
+        }
+      },
+      {
+        "comment": "",
+        "key": "Champions!",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Runner-up",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld-%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 497
+        }
+      },
+      {
+        "comment": "",
+        "key": "Aggregate: %lld-%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 556
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ advances",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 558
+        }
+      },
+      {
+        "comment": "",
+        "key": "Second Leg Goals",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 581
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 568
+        }
+      },
+      {
+        "comment": "",
+        "key": "Leg 1",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 564
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld-%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 565
+        }
+      },
+      {
+        "comment": "",
+        "key": "Leg 2",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 570
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld-%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 571
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld'",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 596
+        }
+      },
+      {
+        "comment": "",
+        "key": "ET",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 600
+        }
+      },
+      {
+        "comment": "",
+        "key": "P",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 601
+        }
+      },
+      {
+        "comment": "",
+        "key": "All Matchups",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 610
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld-%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 652
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld-%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 654
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 656
+        }
+      },
+      {
+        "comment": "",
+        "key": "In Progress",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 660
+        }
+      },
+      {
+        "comment": "",
+        "key": "Champions!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 678
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ Winners",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 680
+        }
+      },
+      {
+        "comment": "",
+        "key": "Eliminated",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 686
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Full Results",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 693
+        }
+      }
+    ]
+  },
+  "version": 1
+}
