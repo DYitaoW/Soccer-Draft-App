@@ -137,12 +137,21 @@ struct CupKnockoutView: View {
     // MARK: - Helpers
 
     /// Builds a plausible 11-player name list for an AI team, falling back to
-    /// generated squad names when no real players are known for that club.
+    /// Resolves real squad names for an AI club from the player database, so the
+    /// live feed uses actual players where they exist. Some super-league clubs
+    /// are known by a different name in the database (Leipzig vs RB Leipzig,
+    /// Villarreal vs Villareal), and some have no players at all — those fall
+    /// back to nationality-appropriate generated squad names.
     /// - Parameters:
     ///   - teamName: The AI club's display name.
     ///   - ids: Player IDs to exclude from the result.
     private static func playerNamesForTeam(_ teamName: String, exclude ids: Set<UUID> = []) -> [String] {
-        let teamPlayers = GameData.players.filter { $0.team == teamName && !ids.contains($0.id) }
+        let aliases: [String: String] = [
+            "Leipzig": "RB Leipzig",
+            "Villarreal": "Villareal",
+        ]
+        let resolvedTeam = aliases[teamName] ?? teamName
+        let teamPlayers = GameData.players.filter { $0.team == resolvedTeam && !ids.contains($0.id) }
         if !teamPlayers.isEmpty {
             return teamPlayers.map { $0.name }
         }
@@ -154,10 +163,15 @@ struct CupKnockoutView: View {
         cupTeams.first { $0.id == playerTeamId } ?? CupModels.playerTeam
     }
 
-    /// Player names for the current drawn opponent.
+    /// Player names for the current drawn opponent. Names already on the user's
+    /// squad are excluded (a drafted player should not line up against his own
+    /// club), falling back to the full list if that would empty it.
     private func opponentPlayerNames() -> [String] {
         guard let opp = opponent else { return [] }
-        return Self.playerNamesForTeam(opp.name)
+        let names = Self.playerNamesForTeam(opp.name)
+        guard !userPlayerNames.isEmpty else { return names }
+        let filtered = names.filter { !userPlayerNames.contains($0) }
+        return filtered.isEmpty ? names : filtered
     }
 
     // MARK: - Setup

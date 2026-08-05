@@ -289,7 +289,8 @@ struct PlaySeasonView: View {
             name: customTeamName(),
             offense: Int(gameState.adjustedAttackRating.rounded()),
             midfield: Int(gameState.adjustedMidfieldRating.rounded()),
-            defense: Int(((gameState.adjustedDefenseRating + gameState.adjustedGkRating) / 2).rounded())
+            defense: Int(gameState.adjustedDefenseRating.rounded()),
+            goalkeeper: Int(gameState.adjustedGkRating.rounded())
         )
         let newResult = SeasonSimulator.simulateSeason(
             playerTeam: newTeam,

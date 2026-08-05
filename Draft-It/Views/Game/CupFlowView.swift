@@ -15,6 +15,7 @@ struct CupFlowView: View {
     let attack: Int
     let midfield: Int
     let defense: Int
+    let goalkeeper: Int
     let seasonResult: SeasonSimulationResult?
     let userPlayerNames: [String]
     let gameMode: GameMode
@@ -270,7 +271,7 @@ struct CupFlowView: View {
         let replaceIdx = potIndices.randomElement()!
         let replaced = teams[replaceIdx]
         let playerTeam = CupTeam(id: playerTeamId, name: customTeamName(),
-                                 offense: attack, midfield: midfield, defense: defense, pot: replaced.pot)
+                                 offense: attack, midfield: midfield, defense: defense, goalkeeper: goalkeeper, pot: replaced.pot)
         teams[replaceIdx] = playerTeam
         cupTeams = teams
 
@@ -430,6 +431,7 @@ struct CupFlowView: View {
         attack: 85,
         midfield: 83,
         defense: 82,
+        goalkeeper: 82,
         seasonResult: SeasonSimulationResult(
             matches: [],
             standings: [],

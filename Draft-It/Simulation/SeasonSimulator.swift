@@ -203,16 +203,16 @@ struct SeasonSimulator {
 
     /// Simulates one league match using position-wise matchups.
     ///
-    /// Rather than comparing a single overall number, each team's attack is
-    /// matched against the opponent's defense and each midfield against the
-    /// other's midfield. A team's defensive rating (which for the user blends
-    /// the defender and goalkeeper averages) shapes both how many goals it
-    /// concedes and how much scoring variance it allows: a goalie/defense rated
-    /// well below the league suppress goals and quells swings, while a weak one
-    /// leaks more and more randomly. There is no hard "must be X overall to win"
-    /// rule; results fall out of the matchups, so similar squads finish close and
-    /// stronger squads beat weaker ones. The `difficulty` ramp erodes the
-    /// player's modest home/away edge on long dynasty runs.
+    /// Rather than comparing a single overall number, scoring is driven by the
+    /// attacking team's offense matched against the opponent's outfield defense
+    /// AND its goalkeeper separately, plus a midfield matchup. That makes a
+    /// strong attack a large lever on goals scored, while a strong defense or a
+    /// strong keeper both meaningfully suppress what the opposition scores. A
+    /// team with a big attack but weak defense/keeper therefore scores freely
+    /// AND concedes freely, instead of every strong squad just steamrolling
+    /// both ends of the pitch. There is no hard "must be X overall to win" rule.
+    /// The `difficulty` ramp erodes the player's modest home/away edge on long
+    /// dynasty runs.
     /// - Returns: A tuple of home and away goals.
     private static func simulateMatch(home: Team, away: Team, homeForm: Double, awayForm: Double, difficulty: Double = 0) -> (Int, Int) {
         let isPlayerHome = home.name == customTeamName()
@@ -224,25 +224,33 @@ struct SeasonSimulator {
         // Slight structural edge for the side playing at home.
         let homeAdvantage = 0.12
 
-        // Position-wise matchups: offense vs the opponent's defense, and
+        // Position-wise matchups: offense vs the opponent's defense, offense vs
+        // the opponent's goalkeeper (each is a separate defensive lever), and
         // midfield vs midfield.
-        let homeAttackEdge = Double(home.offense - away.defense)
+        let homeAttEdge = Double(home.offense - away.defense)
+        let homeGkEdge = Double(home.offense - away.goalkeeper)
         let homeMidEdge = Double(home.midfield - away.midfield)
-        let awayAttackEdge = Double(away.offense - home.defense)
+        let awayAttEdge = Double(away.offense - home.defense)
+        let awayGkEdge = Double(away.offense - home.goalkeeper)
         let awayMidEdge = Double(away.midfield - home.midfield)
 
-        // Defensive/goalkeeper shaping. A defense below the league's 84 ceiling
-        // both concedes more and opens up the match (wider swings), while a high
-        // defense keeps things tight.
-        let homeDefFactor = 1.0 + (84.0 - Double(home.defense)) * 0.012
-        let awayDefFactor = 1.0 + (84.0 - Double(away.defense)) * 0.012
+        // Combined defensive strength (outfield + keeper) of the team doing the
+        // conceding. A defense below the league's 84 ceiling both leaks more and
+        // opens up the match (wider swings), while a high one keeps it tight.
+        let homeDefStrength = (Double(home.defense) + Double(home.goalkeeper)) / 2.0
+        let awayDefStrength = (Double(away.defense) + Double(away.goalkeeper)) / 2.0
+        let homeDefFactor = 1.0 + (84.0 - homeDefStrength) * 0.012
+        let awayDefFactor = 1.0 + (84.0 - awayDefStrength) * 0.012
 
         // Scoring variance: shaped by the defense the shooter faces.
         let homeVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.10) * awayDefFactor
         let awayVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.10) * homeDefFactor
 
-        let homeExp = max(0.15, (1.18 + homeAttackEdge * 0.055 + homeMidEdge * 0.030 + homeAdvantage + homeBonus) * homeForm * homeVar)
-        let awayExp = max(0.15, (1.06 + awayAttackEdge * 0.055 + awayMidEdge * 0.030 + awayBonus) * awayForm * awayVar)
+        // Attack carries the largest weight on goals scored; the goalkeeper edge
+        // outweighs the outfield-defense edge so a weak keeper concedes more,
+        // while a strong outfield defense still suppresses goals on its own.
+        let homeExp = max(0.12, (1.18 + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homeBonus) * homeForm * homeVar)
+        let awayExp = max(0.12, (1.06 + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayBonus) * awayForm * awayVar)
 
         return (poisson(homeExp), poisson(awayExp))
     }

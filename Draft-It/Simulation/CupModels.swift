@@ -16,18 +16,33 @@ struct CupTeam: Identifiable, Hashable, Codable {
     let offense: Int
     let midfield: Int
     let defense: Int
+    let goalkeeper: Int
     let pot: Int
 
-    init(id: UUID = UUID(), name: String, offense: Int, midfield: Int, defense: Int, pot: Int) {
+    init(id: UUID = UUID(), name: String, offense: Int, midfield: Int, defense: Int, goalkeeper: Int? = nil, pot: Int) {
         self.id = id
         self.name = name
         self.offense = offense
         self.midfield = midfield
         self.defense = defense
+        self.goalkeeper = goalkeeper ?? defense
         self.pot = pot
     }
 
-    /// The team's overall rating: the rounded mean of its three ratings.
+    /// Restores a team from a saved snapshot, falling back to the defense rating
+    /// when the goalkeeper key is absent (saves written before it existed).
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        offense = try c.decode(Int.self, forKey: .offense)
+        midfield = try c.decode(Int.self, forKey: .midfield)
+        defense = try c.decode(Int.self, forKey: .defense)
+        goalkeeper = try c.decodeIfPresent(Int.self, forKey: .goalkeeper) ?? defense
+        pot = try c.decode(Int.self, forKey: .pot)
+    }
+
+    /// The team's overall rating: the rounded mean of its three outfield ratings.
     var overall: Int { Int((Double(offense + midfield + defense) / 3).rounded()) }
 }
 
@@ -229,28 +244,16 @@ struct SimulatedKnockoutLeg {
         homeTeam = home
         awayTeam = away
 
-        let baseHomeOff = Double(home.offense) * 0.50 + Double(home.midfield) * 0.30 + Double(home.defense) * 0.20
-        let baseHomeDef = Double(home.defense) * 0.50 + Double(home.midfield) * 0.30 + Double(home.offense) * 0.20
-        let baseAwayOff = Double(away.offense) * 0.50 + Double(away.midfield) * 0.30 + Double(away.defense) * 0.20
-        let baseAwayDef = Double(away.defense) * 0.50 + Double(away.midfield) * 0.30 + Double(away.offense) * 0.20
-
-        let homeOff = baseHomeOff
-        let homeDef = baseHomeDef
-        let awayOff = baseAwayOff
-        let awayDef = baseAwayDef
-
-        let homeVar = 1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.14
-        let awayVar = 1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.14
-        let playerHomeBonus = home.name == customTeamName() ? 0.24 : 0.0
-        let playerAwayBonus = away.name == customTeamName() ? 0.16 : 0.0
-        let homeExp = max(0.15, (homeOff / 34 - awayDef / 44 + 0.50 + playerHomeBonus) * homeVar)
-        let awayExp = max(0.10, (awayOff / 34 - homeDef / 44 + 0.38 + playerAwayBonus) * awayVar)
-
-        let rawHome = CupModels.poisson(homeExp)
-        let rawAway = CupModels.poisson(awayExp)
-
         let homePlayers = homePlayerNames ?? Self.squadNames(for: home.name, count: 11)
         let awayPlayers = awayPlayerNames ?? Self.squadNames(for: away.name, count: 11)
+
+        // Knockout legs use the same position-wise matchup + goalkeeper factoring
+        // as the group stage, with a slightly higher player edge and variance.
+        let playerHomeBonus = home.name == customTeamName() ? 0.24 : 0.0
+        let playerAwayBonus = away.name == customTeamName() ? 0.16 : 0.0
+        let exp = CupModels.expectedGoals(home: home, away: away, homeForm: 1.0, awayForm: 1.0, homePlayerBonus: playerHomeBonus, awayPlayerBonus: playerAwayBonus, homeAdvantage: 0.10, variance: 0.14)
+        let rawHome = CupModels.poisson(exp.home)
+        let rawAway = CupModels.poisson(exp.away)
 
         let (homeScorers, awayScorers) = Self.generateScorers(
             home: home, away: away,
@@ -270,11 +273,11 @@ struct SimulatedKnockoutLeg {
         let levelAfter90 = homeAggLead + rawHome == rawAway
         if allowsExtraTime && levelAfter90 {
             playedExtraTime = true
-            let etVar = 1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.14
-            let etHomeExp = max(0.08, (homeOff / 38 - awayDef / 48 + 0.22 + playerHomeBonus) * etVar)
-            let etAwayExp = max(0.05, (awayOff / 38 - homeDef / 48 + 0.16 + playerAwayBonus) * etVar)
-            let etRawHome = CupModels.poisson(etHomeExp + 0.05)
-            let etRawAway = CupModels.poisson(etAwayExp + 0.05)
+            // Extra time is 30 minutes, so matchup edges are scaled to a third
+            // and the baseline drops to roughly a third of a full half.
+            let etExp = CupModels.expectedGoals(home: home, away: away, homePlayerBonus: playerHomeBonus, awayPlayerBonus: playerAwayBonus, homeAdvantage: 0.06, variance: 0.14, baseHome: 0.66, baseAway: 0.60, floor: 0.05, edgeScale: 0.33)
+            let etRawHome = CupModels.poisson(etExp.home + 0.05)
+            let etRawAway = CupModels.poisson(etExp.away + 0.05)
             let (etHomeS, etAwayS) = Self.generateScorers(
                 home: home, away: away,
                 homeScore: etRawHome, awayScore: etRawAway, isET: true,
@@ -359,7 +362,10 @@ struct SimulatedKnockoutLeg {
     /// - Parameter name: The player's full name.
     /// - Returns: The player's position, or nil if the player is unknown.
     static func position(for name: String) -> Position? {
-        GameData.players.first { $0.name == name }?.positions.first
+        if let p = GameData.players.first(where: { $0.name == name })?.positions.first {
+            return p
+        }
+        return generatedPositions[name]
     }
 
     /// Tallies goals per player for the given team, excluding own goals.
@@ -414,10 +420,10 @@ struct SimulatedKnockoutLeg {
         let awayOutfield = awayPlayers.filter { Self.position(for: $0) != .GK }
 
         for min in homeMinutes {
-            var scorer = weightedRandomElement(from: homeOutfield, substitutes: homeSubstitutes, subWeight: 0.05, defaultName: home.name)
+            var scorer = weightedRandomElement(from: homeOutfield, substitutes: homeSubstitutes, subWeight: 0.05, defaultName: homePlayers.first ?? home.name)
             var isOwnGoal = false
             if !awayPlayers.isEmpty && Double.random(in: 0...1) < 0.03 {
-                scorer = weightedRandomElement(from: awayOutfield, substitutes: awaySubstitutes, subWeight: 0.05, defaultName: away.name)
+                scorer = weightedRandomElement(from: awayOutfield, substitutes: awaySubstitutes, subWeight: 0.05, defaultName: awayPlayers.first ?? away.name)
                 isOwnGoal = true
             }
             let others = homeOutfield.filter { $0 != scorer }
@@ -425,10 +431,10 @@ struct SimulatedKnockoutLeg {
             homeGoals.append(GoalEvent(id: UUID(), minute: min, scorer: scorer, teamId: home.id, isExtraTime: isET, isPenalty: false, isOwnGoal: isOwnGoal, assist: assist))
         }
         for min in awayMinutes {
-            var scorer = weightedRandomElement(from: awayOutfield, substitutes: awaySubstitutes, subWeight: 0.05, defaultName: away.name)
+            var scorer = weightedRandomElement(from: awayOutfield, substitutes: awaySubstitutes, subWeight: 0.05, defaultName: awayPlayers.first ?? away.name)
             var isOwnGoal = false
             if !homePlayers.isEmpty && Double.random(in: 0...1) < 0.03 {
-                scorer = weightedRandomElement(from: homeOutfield, substitutes: homeSubstitutes, subWeight: 0.05, defaultName: home.name)
+                scorer = weightedRandomElement(from: homeOutfield, substitutes: homeSubstitutes, subWeight: 0.05, defaultName: homePlayers.first ?? home.name)
                 isOwnGoal = true
             }
             let others = awayOutfield.filter { $0 != scorer }
@@ -481,18 +487,31 @@ struct SimulatedKnockoutLeg {
         return minutes.sorted()
     }
 
-    /// Generates `count` player names for a team using its nationality's surname pool.
+    /// Generates `count` player names for a team using its nationality's surname
+    /// pool. The pool is rotated by a stable hash of the team name so different
+    /// teams of the same nationality do not share identical squads. Each
+    /// generated name is also recorded with a realistic position so goalkeepers
+    /// are never credited with goals and shootout ordering works.
     /// Assumes `count` is at least 1.
     static func squadNames(for team: String, count: Int) -> [String] {
         let pool = surnamePool(for: team)
+        let hash = team.utf8.reduce(0) { ($0 &* 31) &+ Int($1) }.magnitude
+        let surnameOffset = Int(hash % UInt(pool.count))
+        let firstOffset = Int(hash % UInt(firstNames.count))
+        let positions: [Position] = [.ST, .ST, .LW, .CM, .CM, .RW, .LB, .CB, .CB, .RB, .GK]
         var names: [String] = []
         for i in 0..<count {
-            let first = firstNames[i % firstNames.count]
-            let last = pool[i % pool.count]
-            names.append("\(first) \(last)")
+            let first = firstNames[(i + firstOffset) % firstNames.count]
+            let last = pool[(i + surnameOffset) % pool.count]
+            let name = "\(first) \(last)"
+            names.append(name)
+            generatedPositions[name] = positions[i % positions.count]
         }
         return names
     }
+
+    /// Position lookup for generated squad names (real players resolve via GameData).
+    private static var generatedPositions: [String: Position] = [:]
 
     /// Shared pool of first names used when generating squads.
     private static let firstNames = ["Marcus", "Lucas", "Gabriel", "Rafael", "Diego", "Carlos", "James", "Daniel", "Thomas", "Alexander", "Luis"]
@@ -559,6 +578,55 @@ struct CupModels {
     ///   - playerBonus: Multiplier on the player team's home/away edge (the league
     ///     phase passes ~1.15 to be friendlier; knockout uses 1.0).
     /// - Returns: A tuple of home and away goals.
+    /// Computes expected goals for both sides of a cup match from position-wise
+    /// matchups. Attack drives goals scored (matched against the opponent's
+    /// outfield defense AND against its goalkeeper separately), so a big attack
+    /// against a weak defense or weak keeper scores freely. The goalkeeper
+    /// carries slightly more weight than the outfield defense, so a weak keeper
+    /// leaks noticeably more goals while a strong outfield defense still
+    /// suppresses goals on its own; a good defense therefore concedes few goals
+    /// even with an average keeper, just a few more than with a great one. The
+    /// conceding side's combined defense+keeper level (vs the 84 ceiling) opens
+    /// the game up when low and tightens it when high. The same factoring drives
+    /// the group stage, the knockouts, and the league season.
+    /// - Parameters:
+    ///   - homePlayerBonus: Flat expected-goal bonus for the home side being the player's team.
+    ///   - awayPlayerBonus: Flat expected-goal bonus for the away side being the player's team.
+    ///   - homeAdvantage: Structural edge for the side playing at home.
+    ///   - variance: Random swing magnitude (0.13 group, 0.14 knockouts).
+    ///   - baseHome/baseAway: Baseline scoring before matchups.
+    ///   - floor: Minimum expected goals, guarding against a shutout ceiling.
+    ///   - edgeScale: Multiplier for the matchup edges (reduced for 30-minute ET).
+    static func expectedGoals(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, homePlayerBonus: Double = 0.0, awayPlayerBonus: Double = 0.0, homeAdvantage: Double = 0.10, variance: Double = 0.13, baseHome: Double = 1.16, baseAway: Double = 1.04, floor: Double = 0.12, edgeScale: Double = 1.0) -> (home: Double, away: Double) {
+        // Position-wise matchups: offense vs the opponent's defense, offense vs
+        // the opponent's goalkeeper, and midfield vs midfield.
+        let homeAttEdge = Double(home.offense - away.defense) * edgeScale
+        let homeGkEdge = Double(home.offense - away.goalkeeper) * edgeScale
+        let homeMidEdge = Double(home.midfield - away.midfield) * edgeScale
+        let awayAttEdge = Double(away.offense - home.defense) * edgeScale
+        let awayGkEdge = Double(away.offense - home.goalkeeper) * edgeScale
+        let awayMidEdge = Double(away.midfield - home.midfield) * edgeScale
+
+        // Combined defensive strength (outfield + keeper) of the conceding side.
+        // A defense below the league's 84 ceiling leaks more and opens the game
+        // up, while a high one keeps it tight.
+        let homeDefStrength = (Double(home.defense) + Double(home.goalkeeper)) / 2.0
+        let awayDefStrength = (Double(away.defense) + Double(away.goalkeeper)) / 2.0
+        let homeDefFactor = 1.0 + (84.0 - homeDefStrength) * 0.012
+        let awayDefFactor = 1.0 + (84.0 - awayDefStrength) * 0.012
+
+        // Scoring variance: shaped by the defense the shooter faces.
+        let homeVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * variance) * awayDefFactor
+        let awayVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * variance) * homeDefFactor
+
+        // Attack carries the largest weight on goals scored; the goalkeeper edge
+        // outweighs the outfield-defense edge so a weak keeper concedes more.
+        let homeExp = max(floor, (baseHome + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homePlayerBonus) * homeForm * homeVar)
+        let awayExp = max(floor, (baseAway + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayPlayerBonus) * awayForm * awayVar)
+
+        return (homeExp, awayExp)
+    }
+
     static func simulateCupMatch(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, playerBonus: Double = 1.0) -> (Int, Int) {
         let isPlayerHome = home.name == customTeamName()
         let isPlayerAway = away.name == customTeamName()
@@ -567,30 +635,9 @@ struct CupModels {
         let homeBonus = isPlayerHome ? 0.12 * playerBonus : 0.0
         let awayBonus = isPlayerAway ? 0.08 * playerBonus : 0.0
 
-        // A touch smaller structural edge for the side playing at home.
-        let homeAdvantage = 0.10
+        let exp = expectedGoals(home: home, away: away, homeForm: homeForm, awayForm: awayForm, homePlayerBonus: homeBonus, awayPlayerBonus: awayBonus, homeAdvantage: 0.10, variance: 0.13)
 
-        // Position-wise matchups: offense vs the opponent's defense, and
-        // midfield vs midfield.
-        let homeAttackEdge = Double(home.offense - away.defense)
-        let homeMidEdge = Double(home.midfield - away.midfield)
-        let awayAttackEdge = Double(away.offense - home.defense)
-        let awayMidEdge = Double(away.midfield - home.midfield)
-
-        // Defensive/goalkeeper shaping. A defense below the league's 84 ceiling
-        // both concedes more and opens up the match, while a high defense keeps
-        // it tight.
-        let homeDefFactor = 1.0 + (84.0 - Double(home.defense)) * 0.012
-        let awayDefFactor = 1.0 + (84.0 - Double(away.defense)) * 0.012
-
-        // A touch more variance than the regular season for less predictability.
-        let homeVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.13) * awayDefFactor
-        let awayVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.13) * homeDefFactor
-
-        let homeExp = max(0.15, (1.16 + homeAttackEdge * 0.052 + homeMidEdge * 0.028 + homeAdvantage + homeBonus) * homeForm * homeVar)
-        let awayExp = max(0.15, (1.04 + awayAttackEdge * 0.052 + awayMidEdge * 0.028 + awayBonus) * awayForm * awayVar)
-
-        return (poisson(homeExp), poisson(awayExp))
+        return (poisson(exp.home), poisson(exp.away))
     }
 
     /// Draws an integer from a Poisson distribution with the given mean.
@@ -606,7 +653,7 @@ struct CupModels {
     /// The user's team as a CupTeam, using the saved custom team name and
     /// fixed high ratings.
     static var playerTeam: CupTeam {
-        CupTeam(name: customTeamName(), offense: 85, midfield: 83, defense: 82, pot: 0)
+        CupTeam(name: customTeamName(), offense: 85, midfield: 83, defense: 82, goalkeeper: 82, pot: 0)
     }
 
     /// Generates a full 144-match schedule (36 teams, 8 weeks, 18 matches/week).

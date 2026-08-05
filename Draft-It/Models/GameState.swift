@@ -272,14 +272,17 @@ class GameState: ObservableObject {
     var adjustedGkRating: Double { adjustedRating(for: .gk) }
     var adjustedTeamRating: Double { teamRating + managerBonus }
 
-    /// The user's squad expressed as a `Team` from raw category ratings.
-    /// The defense value blends the defender and goalkeeper averages.
+    /// The user's squad expressed as a `Team` from raw category ratings. Attack,
+    /// defense, and goalkeeper are kept as separate ratings so the simulation can
+    /// weight them independently (a strong attack scores freely, a weak defense
+    /// or keeper concedes freely).
     var playerTeam: Team {
         Team(
             name: customTeamName(),
             offense: Int(attackRating.rounded()),
             midfield: Int(midfieldRating.rounded()),
-            defense: Int(((rating(for: .defense) + gkRating) / 2).rounded())
+            defense: Int(rating(for: .defense).rounded()),
+            goalkeeper: Int(gkRating.rounded())
         )
     }
 
@@ -289,7 +292,8 @@ class GameState: ObservableObject {
             name: customTeamName(),
             offense: Int(adjustedAttackRating.rounded()),
             midfield: Int(adjustedMidfieldRating.rounded()),
-            defense: Int(((adjustedRating(for: .defense) + adjustedGkRating) / 2).rounded())
+            defense: Int(adjustedRating(for: .defense).rounded()),
+            goalkeeper: Int(adjustedGkRating.rounded())
         )
     }
 }
