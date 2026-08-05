@@ -106,6 +106,7 @@ struct PlaySeasonView: View {
                             Button("Skip to End") {
                                 skipAnimation = true
                                 midseasonTransferDone = true
+                                distributeRemainingMatchGoals()
                                 animationIdx = playerMatches.count
                                 revealedMatches = playerMatches.count
                                 withAnimation { finished = true }
@@ -373,6 +374,21 @@ struct PlaySeasonView: View {
             }
         }
         matchScorers[matchId] = scorersThisMatch
+    }
+
+    /// Distributes goals for any player matches that have not yet been revealed
+    /// (used when skipping to the end so scorer totals still match the league
+    /// table's goals-for column).
+    private func distributeRemainingMatchGoals() {
+        guard let result = result else { return }
+        let playerMatches = result.matches
+            .filter { $0.homeTeam.id == result.playerTeamId || $0.awayTeam.id == result.playerTeamId }
+            .sorted { $0.week < $1.week }
+        let remaining = playerMatches.suffix(playerMatches.count - min(animationIdx, playerMatches.count))
+        for match in remaining {
+            let playerScore = match.homeTeam.id == result.playerTeamId ? match.homeScore : match.awayScore
+            distributePlayerGoals(goals: playerScore, matchId: match.id)
+        }
     }
 
     /// Aggregates distributed goals/assists into sorted per-player season stats.

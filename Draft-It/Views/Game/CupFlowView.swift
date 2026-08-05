@@ -111,6 +111,8 @@ struct CupFlowView: View {
                 standings: standings,
                 playerTeamId: playerTeamId,
                 cupTeams: cupTeams,
+                userPlayerNames: userPlayerNames,
+                assignedPlayers: assignedPlayers,
                 onComplete: { updatedStandings, playerPosition in
                     standings = updatedStandings
                     let playerFixtures = allFixtures.filter { fixture in

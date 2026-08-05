@@ -787,7 +787,7 @@ let _players: [Player] = [
     Player(name: "Ibrahim Maza", ovrRating: 79, positions: [.CM], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Jeanuel Belocian", ovrRating: 77, positions: [.CB], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Ernest Poku", ovrRating: 77, positions: [.RW], team: "Leverkusen", league: "Other Leagues"),
-    Player(name: "Axel Tape", ovrRating: 76, positions: [.CDM], team: "Leverkusen", league: "Other Leagues"),
+    Player(name: "Axel Tape", ovrRating: 76, positions: [.CB, .CDM], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Afonso Moreira", ovrRating: 76, positions: [.LW], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Kerim Alajbegovic", ovrRating: 75, positions: [.CAM], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Montrell Culbreath", ovrRating: 74, positions: [.LB], team: "Leverkusen", league: "Other Leagues"),
@@ -1304,7 +1304,7 @@ let _players: [Player] = [
     Player(name: "Sebastian Berhalter", ovrRating: 76, positions: [.CM], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Joaquin Panichelli", ovrRating: 73, positions: [.ST], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Finn Jeltsch", ovrRating: 72, positions: [.CB], team: "Global Superstars", league: "Global Superstars"),
-    Player(name: "Julien Hall", ovrRating: 72, positions: [.CM,.CAM], team: "Global Superstars", league: "Global Superstars"),
+    Player(name: "Julien Hall", ovrRating: 72, positions: [.ST, .LW, .RW], team: "Global Superstars", league: "Global Superstars"),
 
     // MARK: - Newly Added (global superstars)
 

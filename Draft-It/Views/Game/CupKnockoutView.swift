@@ -5,13 +5,14 @@
 import SwiftUI
 
 /// Data shown in the full-screen goal popup that flashes when a knockout goal
-/// is scored: who scored, the updated score, and whether it was the user.
+/// is scored: who scored, the updated scoreline (home score on the left, away
+/// on the right, matching the scoreboard), and whether it was the user.
 private struct GoalPopupInfo {
     let id: UUID
     let teamName: String
     let isPlayer: Bool
-    let score: Int
-    let oppScore: Int
+    let homeScore: Int
+    let awayScore: Int
 }
 
 /// Drives the knockout rounds of a cup competition as a phase state machine
@@ -381,6 +382,8 @@ struct CupKnockoutView: View {
         shownGoals = []
         commentaryEvents = []
         currentMinute = 0
+        goalPopup = nil
+        goalFlashId = nil
         showHTBreak = false
         htBreakDone = false
         showETBreak = false
@@ -755,9 +758,9 @@ struct CupKnockoutView: View {
                 .font(.title3.weight(.bold))
                 .foregroundColor(.white)
             HStack(spacing: 16) {
-                Text("\(info.score)").font(.system(size: 48, weight: .black))
+                Text("\(info.homeScore)").font(.system(size: 48, weight: .black))
                 Text("-").font(.system(size: 36, weight: .heavy))
-                Text("\(info.oppScore)").font(.system(size: 48, weight: .black))
+                Text("\(info.awayScore)").font(.system(size: 48, weight: .black))
             }
             .foregroundColor(.white)
         /*    Text(info.isPlayer ? "YOUR TEAM" : "OPPONENT")
@@ -777,7 +780,8 @@ struct CupKnockoutView: View {
     }
 
     /// Updates the live goal popup for a goal just shown in the playback, computing
-    /// the new scoreline for whichever side the goal rewarded.
+    /// the new scoreline with the home team's score on the left and the away team's
+    /// on the right, matching the sides used by the scoreboard.
     private func showGoalPopup(_ goal: GoalEvent, allGoals: [GoalEvent], leg: SimulatedKnockoutLeg) {
         let isPlayer = goal.teamId == playerTeamId
         let hTeam = currentLegIndex == 0 ? playerTeam : (opponent ?? playerTeam)
@@ -785,9 +789,7 @@ struct CupKnockoutView: View {
         let hScore = allGoals.filter { $0.teamId == hTeam.id && $0.minute <= goal.minute }.count
         let aScore = allGoals.filter { $0.teamId == aTeam.id && $0.minute <= goal.minute }.count
         let scoredTeam = goal.teamId == hTeam.id ? hTeam : aTeam
-        let score = goal.teamId == hTeam.id ? hScore : aScore
-        let oppScore = score == hScore ? aScore : hScore
-        goalPopup = GoalPopupInfo(id: goal.id, teamName: scoredTeam.name, isPlayer: isPlayer, score: score, oppScore: oppScore)
+        goalPopup = GoalPopupInfo(id: goal.id, teamName: scoredTeam.name, isPlayer: isPlayer, homeScore: hScore, awayScore: aScore)
     }
 
     private func teamScoreColumn(name: String, score: Int, isPlayer: Bool) -> some View {
@@ -1165,6 +1167,8 @@ struct CupKnockoutView: View {
     /// Stores the player's final matchup results and winner in `allMatchups` for the
     /// results screen, using aggregate goals or penalty shootout for ties.
     private func updatePlayerMatchup() {
+        goalPopup = nil
+        goalFlashId = nil
         let teamA = playerTeam
         guard let teamB = opponent else { return }
         let isFinal = currentRoundIndex >= 4

@@ -137,6 +137,36 @@ enum CupGoalDistributor {
         return dict
     }
 
+    /// Distributes a single match's goal tally to player names, weighted by
+    /// position, returning the list of scorers for that match (one entry per
+    /// goal) for the game-by-game results. Substitutes get a heavily reduced
+    /// chance, matching the season-total distribution.
+    static func distributeForMatch(goals: Int, userPlayerNames: [String], assignedPlayers: [Int: Player]) -> [String] {
+        guard !userPlayerNames.isEmpty, goals > 0 else { return [] }
+        let nameList = userPlayerNames
+        let assignedNames = Set(assignedPlayers.values.map { $0.name })
+        func goalWeightFor(_ name: String) -> Double {
+            let isSub = !assignedNames.contains(name)
+            let base = assignedPlayers.values.first { $0.name == name }.flatMap { $0.positions.first }.map { goalWeight(for: $0) } ?? 1.0
+            return isSub ? base * 0.05 : base
+        }
+        var scorers: [String] = []
+        for _ in 0..<goals {
+            let weights = nameList.map { goalWeightFor($0) }
+            let total = weights.reduce(0, +)
+            guard total > 0 else { scorers.append(nameList[0]); continue }
+            let r = Double.random(in: 0..<total)
+            var cum = 0.0
+            var scorer = nameList[0]
+            for (i, w) in zip(nameList, weights) {
+                cum += w
+                if r < cum { scorer = i; break }
+            }
+            scorers.append(scorer)
+        }
+        return scorers
+    }
+
     /// Returns the relative likelihood of a player scoring based on position
     /// (strikers highest, goalkeepers essentially never).
     static func goalWeight(for pos: Position) -> Double {

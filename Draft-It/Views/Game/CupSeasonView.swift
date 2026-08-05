@@ -14,12 +14,15 @@ struct CupSeasonView: View {
     let standings: [CupStanding]
     let playerTeamId: UUID
     let cupTeams: [CupTeam]
+    let userPlayerNames: [String]
+    let assignedPlayers: [Int: Player]
     let onComplete: ([CupStanding], Int) -> Void
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var revealedWeeks = 0
     @State private var finished = false
     @State private var skipAnimation = false
+    @State private var matchScorers: [UUID: [String]] = [:]
 
     private let weekCount = 8
     private var delay: Double { UserDefaults.standard.bool(forKey: "fastMode") ? 0.05 : 0.8 }
@@ -49,7 +52,26 @@ struct CupSeasonView: View {
                 }
             }
         }
-        .onAppear { animateWeeks() }
+        .onAppear {
+            precomputeMatchScorers()
+            animateWeeks()
+        }
+    }
+
+    /// Pre-distributes the player team's goals in each fixture to user players
+    /// (weighted by position) so the game-by-game results can show scorer names
+    /// just like the regular season. Computed once so results stay stable.
+    private func precomputeMatchScorers() {
+        var scorers: [UUID: [String]] = [:]
+        for fixture in playerFixtures {
+            let goals = fixture.homeTeam.id == playerTeamId ? fixture.homeScore : fixture.awayScore
+            scorers[fixture.id] = CupGoalDistributor.distributeForMatch(
+                goals: goals,
+                userPlayerNames: userPlayerNames,
+                assignedPlayers: assignedPlayers
+            )
+        }
+        matchScorers = scorers
     }
 
     // MARK: - Player stats from revealed weeks
@@ -149,8 +171,9 @@ struct CupSeasonView: View {
         }
     }
 
-    /// One fixture row: game week, opponent with home/away marker, score, and a
-    /// W/D/L badge colored by the result for the player.
+    /// One fixture row: game week, opponent with home/away marker, score, a
+    /// W/D/L badge colored by the result for the player, and the distributed
+    /// scorer names for that game.
     private func matchRow(match: CupFixture) -> some View {
         let isPlayerHome = match.homeTeam.id == playerTeamId
         let isPlayerAway = match.awayTeam.id == playerTeamId
@@ -162,29 +185,48 @@ struct CupSeasonView: View {
         let homeAway = isPlayerHome ? "(H)" : "(A)"
         let playerScore = isPlayerHome ? match.homeScore : match.awayScore
         let opponentScore = isPlayerHome ? match.awayScore : match.homeScore
+        let scorers = matchScorers[match.id] ?? []
 
-        return HStack(spacing: 8) {
-            Text("GW \(match.week)")
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.secondary)
-                .frame(width: 40, alignment: .leading)
-                .padding(.trailing, 5)
+        return VStack(spacing: 2) {
+            HStack(spacing: 8) {
+                Text("GW \(match.week)")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.secondary)
+                    .frame(width: 40, alignment: .leading)
+                    .padding(.trailing, 5)
 
-            Text("\(opponentName) \(homeAway)")
-                .font(.subheadline.weight(.semibold))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                Text("\(opponentName) \(homeAway)")
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("\(playerScore)-\(opponentScore)")
-                .font(.title3.weight(.bold))
-                .frame(width: 56, alignment: .center)
+                Text("\(playerScore)-\(opponentScore)")
+                    .font(.title3.weight(.bold))
+                    .frame(width: 56, alignment: .center)
 
-            Text(resultChar)
-                .font(.caption.weight(.bold))
-                .foregroundColor(.white)
-                .frame(width: 26, height: 26)
-                .background(resultColor)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                Text(resultChar)
+                    .font(.caption.weight(.bold))
+                    .foregroundColor(.white)
+                    .frame(width: 26, height: 26)
+                    .background(resultColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+            .padding(.vertical, 2)
+
+            HStack(spacing: 4) {
+                if !scorers.isEmpty {
+                    Image(systemName: "soccerball")
+                        .font(.system(size: 8))
+                        .foregroundColor(.secondary)
+                    Text(scorers.joined(separator: ", "))
+                        .font(.system(size: 8))
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 52)
+            .padding(.bottom, 2)
+            .frame(height: 14)
         }
         .padding(.vertical, 2)
         .background(
@@ -299,6 +341,8 @@ struct CupSeasonView: View {
         standings: CupModels.computeStandings(from: fixtures, allTeams: [team, opp] + superLeagueTeams.filter { $0.id != team.id && $0.id != opp.id }),
         playerTeamId: pid,
         cupTeams: [team, opp] + superLeagueTeams.filter { $0.id != team.id && $0.id != opp.id },
+        userPlayerNames: ["Player 1", "Player 2"],
+        assignedPlayers: [:],
         onComplete: { _, _ in }
     )
 }

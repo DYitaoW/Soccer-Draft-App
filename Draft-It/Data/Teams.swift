@@ -25,10 +25,10 @@ let leagueTeams: [Team] = [
     Team(name: "Everton", offense: 80, midfield: 80, defense: 78, goalkeeper: 80),
     Team(name: "Leeds", offense: 80, midfield: 77, defense: 78, goalkeeper: 77),
     Team(name: "Palace", offense: 78, midfield: 80, defense: 80, goalkeeper: 81),
-    Team(name: "Ipswich", offense: 75, midfield: 74, defense: 74, goalkeeper: 76),
-    Team(name: "Coventry", offense: 72, midfield: 74, defense: 72, goalkeeper: 74),
-    Team(name: "Forest", offense: 78, midfield: 80, defense: 78, goalkeeper: 80),
-    Team(name: "Hull", offense: 72, midfield: 73, defense: 73, goalkeeper: 75)
+    Team(name: "Ipswich", offense: 78, midfield: 77, defense: 76, goalkeeper: 78),
+    Team(name: "Coventry", offense: 76, midfield: 76, defense: 75, goalkeeper: 75),
+    Team(name: "Forest", offense: 77, midfield: 80, defense: 78, goalkeeper: 82),
+    Team(name: "Hull", offense: 77, midfield: 77, defense: 75, goalkeeper: 78)
    // Team(name: "Wolves", offense: 78, midfield: 78, defense: 78),
 ]
 
