@@ -14,8 +14,6 @@ struct MidseasonTransferView: View {
     @Binding var transfersRemaining: Int
     let onComplete: () -> Void
     
-    private var transferTitle: String = "Transfer Window"
-
     @State private var selectedSlotIndex: Int?
     @State private var showRandomizer = false
     @State private var randomizerPosition: Position?
@@ -33,7 +31,7 @@ struct MidseasonTransferView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(transferTitle)
+                Text("Transfer Window")
                     .font(.title2.weight(.bold))
                 Spacer()
                 Button(action: onComplete) {
