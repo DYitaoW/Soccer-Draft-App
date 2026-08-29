@@ -69,7 +69,7 @@ struct CupKnockoutView: View {
     @State private var goalPopup: GoalPopupInfo? = nil
     @State private var hPlayerNames: [String] = []
     @State private var aPlayerNames: [String] = []
-    @AppStorage("playablePenalties") private var playablePenalties = false
+    @AppStorage("playablePenalties") private var playablePenalties = true
 
     private let maxLegs: [Int] = [2, 2, 2, 2, 1]
     /// Renders the round title and routes to the sub-view for the current phase,
@@ -567,20 +567,43 @@ struct CupKnockoutView: View {
                         penaltyShootoutFooter
                     } else {
                         VStack(spacing: 0) {
-                          //  Divider()
-                            Button(action: {
-                                let legs = maxLegs[min(currentRoundIndex, maxLegs.count - 1)]
-                                if legs > 1 && currentLegIndex == 0 {
-                                    currentLegIndex = 1
-                                    withAnimation { phase = .legBreak }
-                                } else if needsPenaltyShootout {
-                                    beginPenaltyShootout()
-                                } else {
-                                    updatePlayerMatchup()
-                                    withAnimation { phase = .showingResults }
+                            HStack(spacing: 8) {
+                                Button(action: { fastModeToggle(1.0) }) {
+                                    Text("1x")
+                                        .frame(maxWidth: .infinity)
+                                        .font(.headline.weight(.bold))
                                 }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.roundedRectangle(radius: 10))
+                                .controlSize(.large)
+                                .tint(.green)
+                                
+                                Button(action: { fastModeToggle(2.0) }) {
+                                    Text("2x")
+                                        .frame(maxWidth: .infinity)
+                                        .font(.headline.weight(.bold))
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.roundedRectangle(radius: 10))
+                                .controlSize(.large)
+                                .tint(.orange)
+                                
+                                Button(action: { fastModeToggle(3.0) }) {
+                                    Text("3x")
+                                        .frame(maxWidth: .infinity)
+                                        .font(.headline.weight(.bold))
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.roundedRectangle(radius: 10))
+                                .controlSize(.large)
+                                .tint(.red)
+                            }
+                            
+                            Button(action: {
+                                updatePlayerMatchup()
+                                withAnimation { phase = .showingResults }
                             }) {
-                                Text(needsPenaltyShootout ? "Continue to Penalties" : "Continue")
+                                Text("Continue to Result")
                                     .frame(maxWidth: .infinity)
                                     .font(.headline.weight(.bold))
                             }
@@ -589,7 +612,6 @@ struct CupKnockoutView: View {
                             .controlSize(.large)
                             .tint(.green)
                             .padding(.horizontal)
-                          //  .padding(.vertical, 8)
                             .padding(.bottom, 30)
                         }
                     }
@@ -675,7 +697,7 @@ struct CupKnockoutView: View {
 
     // MARK: - Scoreboard
 
-    private var scoreboard: AnyView {
+private var scoreboard: AnyView {
         let isLeg2 = currentLegIndex == 1
         guard let opp = opponent else { return AnyView(EmptyView()) }
 
@@ -704,11 +726,6 @@ struct CupKnockoutView: View {
                 Text("\(currentMinute)'")
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .foregroundColor(currentMinute > 45 ? .orange : .primary)
-                if currentMinute > 90 {
-                    Text("ET")
-                        .font(.caption.weight(.bold))
-                        .foregroundColor(.orange)
-                }
             }
 
             if isLeg2 {
@@ -723,24 +740,16 @@ struct CupKnockoutView: View {
                         } else if aggA > aggH {
                             Text("(\(aTeam.name) adv.)")
                                 .font(.caption.weight(.bold)).foregroundColor(.green)
-                        } else {
-                            Text("(ET / Pens)")
-                                .font(.caption.weight(.bold)).foregroundColor(.orange)
                         }
                     }
                 }
-            }
-
-            if let l = currentLegIndex == 0 ? leg1 : leg2, l.playedExtraTime {
-                Text("Extra Time")
-                    .font(.caption.weight(.bold)).foregroundColor(.orange)
             }
         }
         .padding()
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
-        )
+)
     }
 
     /// Full-screen goal celebration: soccer ball, the scoring team, the updated
@@ -899,21 +908,19 @@ struct CupKnockoutView: View {
                 return
             }
 
-            let fast = UserDefaults.standard.bool(forKey: "fastMode")
+            let speedMultiplier = 1.0 / simulationSpeed
             let d: Int
-            if fast {
-                d = 5
-            } else if goalPopup != nil {
+            if goalPopup != nil {
                 // Hold a moment longer so the goal celebration is visible.
-                d = 1500
+                d = Int(1500.0 * speedMultiplier)
             } else {
                 let nextGoalMin = goalIdx < allGoalEvents.count ? allGoalEvents[goalIdx].minute : Int.max
                 let nextCardMin = cardIdx < allCardEvents.count ? allCardEvents[cardIdx].minute : Int.max
                 let nextEventMin = min(nextGoalMin, nextCardMin, maxMinute)
                 if currentMinute >= nextEventMin - 2 {
-                    d = 130
+                    d = Int(130.0 * speedMultiplier)
                 } else {
-                    d = 230
+                    d = Int(230.0 * speedMultiplier)
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(d), execute: tick)
@@ -1398,6 +1405,14 @@ struct CupKnockoutView: View {
 
     private var currentRoundName: String {
         knockoutRoundNames[min(currentRoundIndex, 4)]
+    }
+    
+    /// Simulation speed: 1.0 = normal, 2.0 = fast, 3.0 = fastest
+    @AppStorage("simulationSpeed") private var simulationSpeed: Double = 1.0
+    
+    /// Toggles the simulation speed: 1x, 2x, or 3x
+    private func fastModeToggle(_ speed: Double) {
+        simulationSpeed = speed
     }
 }
 

@@ -88,10 +88,13 @@ struct PlayerRandomizerView: View {
 
             HStack(spacing: 20) {
                 if animationDone && rerollsLeft > 0 && !pool.isEmpty {
-                    Button("Re-roll   (\(rerollsLeft))") { reroll() }
+                    Button("Roll Again   (\(rerollsLeft))") { reroll() }
+                        .buttonBorderShape(.roundedRectangle(radius: 10))
                         .buttonStyle(.borderedProminent)
+                        //.cornerRadius(20)
                 } else {
-                    Button("Re-roll   (\(rerollsLeft))") { }
+                    Button("Roll Again   (\(rerollsLeft))") { }
+                        .buttonBorderShape(.roundedRectangle(radius: 10))
                         .buttonStyle(.borderedProminent)
                         .tint(Color(.systemGray4))
                        // .clipShape(RoundedRectangle(cornerRadius: 10))

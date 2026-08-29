@@ -11,9 +11,9 @@ struct SettingsView: View {
     @AppStorage("fastMode") private var fastMode = false
     @AppStorage("colorSchemeMode") private var colorSchemeMode = "system"
     @AppStorage("teamName") private var teamName = "Your Team"
-    @AppStorage("expandedManagerialDecisions") private var expandedManagerialDecisions = false
+    @AppStorage("expandedManagerialDecisions") private var expandedManagerialDecisions = true
     @AppStorage("dynastyMode") private var dynastyMode = true
-    @AppStorage("playablePenalties") private var playablePenalties = false
+    @AppStorage("playablePenalties") private var playablePenalties = true
     @State private var stats: CareerStats = .load()
     @State private var showResetConfirm = false
     @State private var teamNameBuffer = ""
@@ -197,7 +197,6 @@ struct SettingsView: View {
         .shadow(color: .black.opacity(0.2), radius: 20)
         .padding(32)
         .onAppear {
-            dynastyMode = true
             if teamNameBuffer.isEmpty {
                 teamNameBuffer = teamName
             }

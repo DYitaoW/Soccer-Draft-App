@@ -59,7 +59,7 @@ struct SeasonCompleteView: View {
                     cupSection
                 }
                 scorersSection
-                if let onContinue = onContinueDynasty {
+               /* if let onContinue = onContinueDynasty {
                     Button("Continue Dynasty") {
                         onContinue()
                     }
@@ -67,7 +67,7 @@ struct SeasonCompleteView: View {
                     .tint(.orange)
                     .controlSize(.large)
                     .padding(.horizontal)
-                }
+                } */
                 Button(action: onRestart) {
                     HStack(spacing: 6) {
                         Image(systemName: "house.fill")

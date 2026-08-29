@@ -27,44 +27,8 @@ struct KnockoutDrawView: View {
                 .padding(.horizontal)
             Text(lockedOpponent ? "Your opponent is set!" : "Drawing opponent...")
                 .foregroundColor(.secondary)
-            if !lockedOpponent {
+if lockedOpponent {
                 ProgressView().padding(.top, 8)
-            }
-            if !lockedOpponent && !opponentPool.isEmpty {
-                VStack(spacing: 6) {
-                    Text("Possible opponents")
-                        .font(.caption).foregroundColor(.secondary)
-                        .padding(.top, 8)
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 6) {
-                            ForEach(Array(opponentPool.prefix(6)), id: \.id) { team in
-                                HStack(spacing: 8) {
-                                    Circle()
-                                        .fill(teamColor(named: team.name))
-                                        .frame(width: 10, height: 10)
-                                    Text(team.name)
-                                        .font(.subheadline.weight(.semibold))
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 14)
-                                .background(Color(.systemGray6))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
-                                )
-                                .padding(.horizontal, 30)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .frame(maxHeight: 200)
-                }
-                .padding()
-                .background(Color(.systemGray5).opacity(0.5))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal, 20)
             }
             Spacer()
         }

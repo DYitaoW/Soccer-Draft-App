@@ -109,7 +109,7 @@ struct GameData {
 
         // MARK: - Newly Added
         Manager(name: "Zinedine Zidane", rating: 85, league: "International"),
-        Manager(name: "Mauricio Pochettino", rating: 87, league: "International"),
+        Manager(name: "Mauricio Pochettino", rating: 86, league: "International"),
         Manager(name: "Julian Nagelsmann", rating: 84, league: "Unemployed"),
         Manager(name: "Ruben Amorim", rating: 82, league: "Serie A"),
         Manager(name: "Roberto De Zerbi", rating: 84, league: "Premier League"),

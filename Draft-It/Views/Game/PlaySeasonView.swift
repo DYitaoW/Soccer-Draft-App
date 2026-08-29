@@ -112,6 +112,7 @@ struct PlaySeasonView: View {
                                 withAnimation { finished = true }
                             }
                             .buttonStyle(.borderedProminent)
+                            .buttonBorderShape(.roundedRectangle(radius: 10))
                             .controlSize(.large)
                             .padding(.top, 30)
                             .tint(.green)
