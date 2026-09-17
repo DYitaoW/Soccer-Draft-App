@@ -19,6 +19,11 @@ struct PlayerRandomizerView: View {
     let showOtherLeagues: Bool
     let showGlobalSuperstars: Bool
     let showPastLegends: Bool
+    let showUpgradedPlayers: Bool
+    let showCultHeros: Bool
+    let showFutureSuperstars: Bool
+    let showWomensStars: Bool
+    let showRandomBums: Bool
     let minRating: Int
     let onSelect: (Player) -> Void
     let onCancel: () -> Void
@@ -32,6 +37,11 @@ struct PlayerRandomizerView: View {
     /// so the parent can cache them for the next time this popup is opened.
     let onCandidatesChanged: (([Player]) -> Void)?
 
+    /// Transfer budget mode support: remaining budget and value calculator.
+    let transferBudgetRemaining: Int
+    let transferValue: ((Player) -> Int)?
+    let gameMode: GameMode
+
     @State private var finalCandidates: [Player] = []
     @State private var displayNames: [String] = Array(repeating: "", count: 5)
     @State private var slotLocked: [Bool] = Array(repeating: false, count: 5)
@@ -41,8 +51,8 @@ struct PlayerRandomizerView: View {
     @State private var animationId = 0
     @State private var startingRerolls = 0
 
-    /// The eligible player pool after applying position, exclusion, league, and
-    /// minimum-rating filters.
+    /// The eligible player pool after applying position, exclusion, league,
+    /// minimum-rating, and transfer budget filters.
     private var pool: [Player] {
         var f = allPlayers.filter { !excludedIds.contains($0.id) }
         if !excludedNames.isEmpty {
@@ -52,17 +62,39 @@ struct PlayerRandomizerView: View {
             f = f.filter { $0.canPlay(pos) }
         }
         f = f.filter { player in
+            // No Premier League mode: block PL, force Other Leagues + Global Superstars on
+            if gameMode == .noPremierLeague {
+                switch player.league {
+                case "Premier League": return false
+                case "Other Leagues", "Global Superstars": return true
+                case "Past Legends": return showPastLegends
+                case "Upgraded Players": return showUpgradedPlayers
+                case "Cult Heros": return showCultHeros
+                case "Future Superstars": return showFutureSuperstars
+                case "Womens Stars": return showWomensStars
+                case "Random Bums": return showRandomBums
+                default: return true
+                }
+            }
             switch player.league {
             case "Premier League": return showPremierLeague
             case "Other Leagues": return showOtherLeagues
             case "Global Superstars": return showGlobalSuperstars
             case "Past Legends": return showPastLegends
-            case "Upgraded Players": return showPastLegends
+            case "Upgraded Players": return showUpgradedPlayers
+            case "Cult Heros": return showCultHeros
+            case "Future Superstars": return showFutureSuperstars
+            case "Womens Stars": return showWomensStars
+            case "Random Bums": return showRandomBums
             default: return true
             }
         }
         if minRating > 0 {
             f = f.filter { $0.ovrRating >= minRating }
+        }
+        // In transfer budget mode, only show players the user can afford
+        if gameMode == .transferBudget, let valueFn = transferValue {
+            f = f.filter { valueFn($0) <= transferBudgetRemaining }
         }
         return f
     }
@@ -78,6 +110,18 @@ struct PlayerRandomizerView: View {
         VStack(spacing: 10) {
             Text(position != nil ? "Select \(position!.rawValue)" : "Select Substitute")
                 .font(.title2).fontWeight(.bold)
+            if gameMode == .transferBudget {
+                HStack {
+                    Text("Budget Remaining:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("$\(transferBudgetRemaining)M")
+                        .font(.headline).fontWeight(.bold)
+                        .foregroundColor(transferBudgetRemaining > 20 ? .green : .red)
+                }
+                .padding(.horizontal, 4)
+            }
             if pool.isEmpty {
                 Text("No eligible players available")
                     .foregroundColor(.secondary)
@@ -126,7 +170,7 @@ struct PlayerRandomizerView: View {
     private func candidateSlot(_ i: Int) -> some View {
         if i < finalCandidates.count, slotLocked[i] {
             Button { onSelect(finalCandidates[i]) } label: {
-                PlayerCard(player: finalCandidates[i], showRatings: showRatings)
+                PlayerCard(player: finalCandidates[i], showRatings: showRatings, transferValue: transferValue?(finalCandidates[i]))
             }
             .buttonStyle(.plain)
         } else if i < finalCandidates.count {
@@ -174,6 +218,8 @@ struct PlayerRandomizerView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(displayNames[i].isEmpty ? "???" : displayNames[i])
                     .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
                     .foregroundColor(.primary)
                 Text("???")
                     .font(.subheadline)
@@ -279,6 +325,7 @@ struct PlayerRandomizerView: View {
 struct PlayerCard: View {
     let player: Player
     let showRatings: Bool
+    let transferValue: Int?
 
     /// Color derived from the player's first position.
     private var positionColor: Color? {
@@ -294,6 +341,8 @@ struct PlayerCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(player.name)
                     .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
                 Text(player.team)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
@@ -311,9 +360,15 @@ struct PlayerCard: View {
                         .font(.title3).fontWeight(.bold)
                         .foregroundColor(.secondary)
                 }
-                Text(player.effectivePositions.map(\.rawValue).joined(separator: "/"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if let value = transferValue {
+                    Text("$\(value)M")
+                        .font(.caption).fontWeight(.bold)
+                        .foregroundColor(.green)
+                } else {
+                    Text(player.effectivePositions.map(\.rawValue).joined(separator: "/"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding()
@@ -338,12 +393,20 @@ struct PlayerCard: View {
         showOtherLeagues: true,
         showGlobalSuperstars: true,
         showPastLegends: true,
+        showUpgradedPlayers: true,
+        showCultHeros: true,
+        showFutureSuperstars: true,
+        showWomensStars: true,
+        showRandomBums: true,
         minRating: 0,
         onSelect: { _ in },
         onCancel: {},
         onReroll: {},
         initialCandidates: nil,
-        onCandidatesChanged: nil
+        onCandidatesChanged: nil,
+        transferBudgetRemaining: 100,
+        transferValue: nil,
+        gameMode: .normal
     )
     .padding()
 }
@@ -360,12 +423,20 @@ struct PlayerCard: View {
         showOtherLeagues: false,
         showGlobalSuperstars: false,
         showPastLegends: false,
+        showUpgradedPlayers: false,
+        showCultHeros: false,
+        showFutureSuperstars: false,
+        showWomensStars: false,
+        showRandomBums: false,
         minRating: 0,
         onSelect: { _ in },
         onCancel: {},
         onReroll: {},
         initialCandidates: nil,
-        onCandidatesChanged: nil
+        onCandidatesChanged: nil,
+        transferBudgetRemaining: 100,
+        transferValue: nil,
+        gameMode: .normal
     )
     .padding()
 }

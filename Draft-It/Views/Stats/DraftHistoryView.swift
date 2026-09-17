@@ -140,7 +140,7 @@ struct DraftHistoryRow: View {
 
     /// Color for the cup result based on the Super League round reached.
     private var cupColor: Color {
-        guard let round = draft.superLeagueRound else { return .red.opacity(0.6) }
+        guard let round = draft.superLeagueRound else { return .secondary }
         switch round {
         case .winner: return .yellow
         case .final: return .orange

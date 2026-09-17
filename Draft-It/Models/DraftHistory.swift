@@ -53,10 +53,10 @@ struct DraftHistory: Codable, Identifiable {
         return df.string(from: date)
     }
 
-    /// A short label for the Super League result: "DNQ" when the team did not
-    /// qualify, or an abbreviation of the round reached.
+    /// A short label for the Super League result: "OFF" when cups were disabled,
+    /// or an abbreviation of the round reached.
     var superLeagueDisplay: String {
-        guard let round = superLeagueRound else { return "DNQ" }
+        guard let round = superLeagueRound else { return "OFF" }
         switch round {
         case .league: return "League"
         case .firstRound: return "KO"

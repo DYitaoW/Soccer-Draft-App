@@ -86,9 +86,14 @@ struct PlaySeasonView: View {
     private var delay: Double { UserDefaults.standard.bool(forKey: "fastMode") ? 0.05 : 1.0 }
 
     /// Dynasty difficulty ramp: each title won reduces the player's match bonus
-    /// (capped at full erosion), making repeat title runs progressively harder.
+    /// and boosts opponents, making repeat title runs progressively harder.
     private func difficultyRamp(seasonsWon: Int) -> Double {
-        min(1.0, Double(seasonsWon) * 0.25)
+        min(3.0, Double(seasonsWon) * 0.25)
+    }
+
+    /// Additional OVR boost applied to all opponents per dynasty title won.
+    private func dynastyOvrBoost(seasonsWon: Int) -> Int {
+        min(6, seasonsWon)
     }
 
     /// While simulating shows a progress screen; once the result exists, renders the
@@ -202,7 +207,10 @@ struct PlaySeasonView: View {
             playerTeam: playerTeam,
             opponents: selectedOpponents,
             projectedPosition: projectedPosition,
-            difficulty: difficultyRamp(seasonsWon: dynastyCount)
+            difficulty: difficultyRamp(seasonsWon: dynastyCount),
+            gameMode: gameState.gameMode,
+            dynastyBoost: dynastyOvrBoost(seasonsWon: dynastyCount),
+            playerGameState: gameState
         )
         result = simulated
         playerTeamId = simulated.playerTeamId
@@ -298,7 +306,10 @@ struct PlaySeasonView: View {
             playerTeam: newTeam,
             opponents: savedOpponents,
             projectedPosition: currentResult.projectedPosition,
-            difficulty: difficultyRamp(seasonsWon: UserDefaults.standard.integer(forKey: "dynastySeasonCount"))
+            difficulty: difficultyRamp(seasonsWon: UserDefaults.standard.integer(forKey: "dynastySeasonCount")),
+            gameMode: gameState.gameMode,
+            dynastyBoost: dynastyOvrBoost(seasonsWon: UserDefaults.standard.integer(forKey: "dynastySeasonCount")),
+            playerGameState: gameState
         )
 
         let firstHalf = currentResult.matches.filter { $0.week <= 19 }

@@ -78,7 +78,10 @@ struct SeasonSimulator {
         playerTeam: Team,
         opponents: [Team],
         projectedPosition: Int,
-        difficulty: Double = 0
+        difficulty: Double = 0,
+        gameMode: GameMode = .normal,
+        dynastyBoost: Int = 0,
+        playerGameState: GameState? = nil
     ) -> SeasonSimulationResult {
         let allTeams = [playerTeam] + opponents
         var standings: [UUID: LeagueStanding] = [:]
@@ -112,11 +115,51 @@ struct SeasonSimulator {
             for (homeIdx, awayIdx) in fixtures {
                 let home = allTeams[homeIdx]
                 let away = allTeams[awayIdx]
+
+                // Apply OVR adjustments based on game mode
+                let isPlayerHome = home.id == playerTeam.id
+                let isPlayerAway = away.id == playerTeam.id
+                let opponentBoost = gameMode.opponentBoost
+                let playerBoost = gameMode.playerBoost
+
+                let boostedHome: Team = isPlayerHome ? Team(
+                    id: home.id, name: home.name,
+                    offense: home.offense + playerBoost, midfield: home.midfield + playerBoost,
+                    defense: home.defense + playerBoost, goalkeeper: home.goalkeeper
+                ) : Team(
+                    id: home.id, name: home.name,
+                    offense: home.offense + opponentBoost + dynastyBoost, midfield: home.midfield + opponentBoost + dynastyBoost,
+                    defense: home.defense + opponentBoost + dynastyBoost, goalkeeper: home.goalkeeper
+                )
+                let boostedAway: Team = isPlayerAway ? Team(
+                    id: away.id, name: away.name,
+                    offense: away.offense + playerBoost, midfield: away.midfield + playerBoost,
+                    defense: away.defense + playerBoost, goalkeeper: away.goalkeeper
+                ) : Team(
+                    id: away.id, name: away.name,
+                    offense: away.offense + opponentBoost + dynastyBoost, midfield: away.midfield + opponentBoost + dynastyBoost,
+                    defense: away.defense + opponentBoost + dynastyBoost, goalkeeper: away.goalkeeper
+                )
+
+                // Calculate weak link penalties for player team matches
+                var homeWL: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+                var awayWL: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+                if let gs = playerGameState {
+                    if home.id == playerTeam.id {
+                        homeWL = gs.weakLinkPenalties(vs: boostedAway)
+                    }
+                    if away.id == playerTeam.id {
+                        awayWL = gs.weakLinkPenalties(vs: boostedHome)
+                    }
+                }
+
                 let (hScore, aScore) = simulateMatch(
-                    home: home, away: away,
+                    home: boostedHome, away: boostedAway,
                     homeForm: seasonForm[home.id] ?? 1.0,
                     awayForm: seasonForm[away.id] ?? 1.0,
-                    difficulty: difficulty
+                    difficulty: difficulty,
+                    homeWeakLinkPenalties: homeWL,
+                    awayWeakLinkPenalties: awayWL
                 )
 
                 matches.append(SimulatedMatch(
@@ -214,7 +257,7 @@ struct SeasonSimulator {
     /// The `difficulty` ramp erodes the player's modest home/away edge on long
     /// dynasty runs.
     /// - Returns: A tuple of home and away goals.
-    private static func simulateMatch(home: Team, away: Team, homeForm: Double, awayForm: Double, difficulty: Double = 0) -> (Int, Int) {
+    private static func simulateMatch(home: Team, away: Team, homeForm: Double, awayForm: Double, difficulty: Double = 0, homeWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0), awayWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)) -> (Int, Int) {
         let isPlayerHome = home.name == customTeamName()
         let isPlayerAway = away.name == customTeamName()
         let ramp = max(0, min(1, difficulty))
@@ -246,11 +289,19 @@ struct SeasonSimulator {
         let homeVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.10) * awayDefFactor
         let awayVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * 0.10) * homeDefFactor
 
+        // Momentum/Pressure: Big Team Closing & Comeback Scaling
+        // Higher-rated teams close out games better and mount bigger comebacks.
+        let overallDiff = Double(home.overall - away.overall)
+        let momentumScale = 0.003
+        let homeMomentum = 1.0 + overallDiff * momentumScale
+        let awayMomentum = 1.0 - overallDiff * momentumScale
+
         // Attack carries the largest weight on goals scored; the goalkeeper edge
         // outweighs the outfield-defense edge so a weak keeper concedes more,
         // while a strong outfield defense still suppresses goals on its own.
-        let homeExp = max(0.12, (1.18 + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homeBonus) * homeForm * homeVar)
-        let awayExp = max(0.12, (1.06 + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayBonus) * awayForm * awayVar)
+        // Weak link penalties reduce scoring when a player is outmatched.
+        let homeExp = max(0.12, (1.18 + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homeBonus + homeWeakLinkPenalties.attack + homeWeakLinkPenalties.midfield * 0.5) * homeForm * homeVar * homeMomentum)
+        let awayExp = max(0.12, (1.06 + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayBonus + awayWeakLinkPenalties.attack + awayWeakLinkPenalties.midfield * 0.5) * awayForm * awayVar * awayMomentum)
 
         return (poisson(homeExp), poisson(awayExp))
     }

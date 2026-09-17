@@ -25,6 +25,7 @@ struct CupFlowView: View {
     let manager: Manager?
     let regularDraftId: UUID?
     let onRestart: () -> Void
+    var playerGameState: GameState? = nil
 
     @AppStorage("dynastyMode") private var dynastyMode = true
 
@@ -192,7 +193,9 @@ struct CupFlowView: View {
                                 substitutes: self.substitutes,
                                 formation: self.formation,
                                 manager: self.manager,
-                                seasonCount: seasonCount
+                                seasonCount: seasonCount,
+                                gameMode: self.gameMode,
+                                transferBudgetAmount: self.playerGameState?.transferBudget ?? 100
                             )
                         }
                         let leagueStandings = self.seasonResult?.standings ?? []
@@ -272,9 +275,35 @@ struct CupFlowView: View {
         guard !potIndices.isEmpty else { cupTeams = teams; return }
         let replaceIdx = potIndices.randomElement()!
         let replaced = teams[replaceIdx]
+
+        // Apply player OVR boost/penalty based on selected game mode
+        let playerBoost = gameMode.playerBoost
         let playerTeam = CupTeam(id: playerTeamId, name: customTeamName(),
-                                 offense: attack, midfield: midfield, defense: defense, goalkeeper: goalkeeper, pot: replaced.pot)
+                                 offense: max(1, attack + playerBoost),
+                                 midfield: max(1, midfield + playerBoost),
+                                 defense: max(1, defense + playerBoost),
+                                 goalkeeper: max(1, goalkeeper + playerBoost),
+                                 pot: replaced.pot)
         teams[replaceIdx] = playerTeam
+
+        // Apply OVR boost to all AI teams based on game mode (Super League is slightly harder)
+        // plus Dynasty mode progress boost if active.
+        let baseBoost = gameMode.opponentBoost
+        let cupOpponentBoost = baseBoost >= 0 ? baseBoost + 1 : baseBoost - 1
+        let dynastyBoost = dynastyMode ? min(6, UserDefaults.standard.integer(forKey: "dynastySeasonCount")) : 0
+        let totalOpponentBoost = cupOpponentBoost + dynastyBoost
+        if totalOpponentBoost != 0 {
+            teams = teams.map { team in
+                if team.id == playerTeamId { return team }
+                return CupTeam(id: team.id, name: team.name,
+                               offense: max(1, team.offense + totalOpponentBoost),
+                               midfield: max(1, team.midfield + totalOpponentBoost),
+                               defense: max(1, team.defense + totalOpponentBoost),
+                               goalkeeper: max(1, team.goalkeeper + totalOpponentBoost),
+                               pot: team.pot)
+            }
+        }
+
         cupTeams = teams
 
         let fixtures = CupModels.generateFullSchedule(teams: teams, playerBonus: 1.15)
@@ -284,8 +313,18 @@ struct CupFlowView: View {
 
     /// Simulates a two-legged knockout tie between two teams and returns the match record.
     private func twoLegMatch(teamA: CupTeam, teamB: CupTeam, round: String) -> CupKnockoutMatch {
-        let (s1a, s1b) = CupModels.simulateCupMatch(home: teamA, away: teamB)
-        let (s2a, s2b) = CupModels.simulateCupMatch(home: teamB, away: teamA)
+        var homeWL1: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+        var awayWL1: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+        var homeWL2: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+        var awayWL2: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)
+        if let gs = playerGameState {
+            if teamA.id == playerTeamId { homeWL1 = gs.weakLinkPenalties(vs: teamB) }
+            if teamB.id == playerTeamId { awayWL1 = gs.weakLinkPenalties(vs: teamA) }
+            if teamB.id == playerTeamId { homeWL2 = gs.weakLinkPenalties(vs: teamA) }
+            if teamA.id == playerTeamId { awayWL2 = gs.weakLinkPenalties(vs: teamB) }
+        }
+        let (s1a, s1b) = CupModels.simulateCupMatch(home: teamA, away: teamB, homeWeakLinkPenalties: homeWL1, awayWeakLinkPenalties: awayWL1)
+        let (s2a, s2b) = CupModels.simulateCupMatch(home: teamB, away: teamA, homeWeakLinkPenalties: homeWL2, awayWeakLinkPenalties: awayWL2)
         return CupKnockoutMatch(
             id: UUID(), round: round,
             teamA: teamA, teamB: teamB,

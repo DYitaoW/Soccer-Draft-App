@@ -53,7 +53,7 @@ struct SeasonOdds: Codable {
     ///   - playerTeam: The team whose odds are being estimated.
     ///   - opponents: The pool of teams opponents are drawn from.
     /// - Returns: Computed probabilities and expected points/position.
-    static func calculate(playerTeam: Team, opponents: [Team], difficulty: Double = 0) -> SeasonOdds {
+    static func calculate(playerTeam: Team, opponents: [Team], difficulty: Double = 0, gameMode: GameMode = .normal, dynastyBoost: Int = 0) -> SeasonOdds {
         let iterations = 150
         var positions: [Int] = []
         var points: [Int] = []
@@ -67,7 +67,9 @@ struct SeasonOdds: Codable {
                 playerTeam: playerTeam,
                 opponents: seasonOpponents,
                 projectedPosition: 0,
-                difficulty: difficulty
+                difficulty: difficulty,
+                gameMode: gameMode,
+                dynastyBoost: dynastyBoost
             )
             let pos = sim.playerPosition
             positions.append(pos)

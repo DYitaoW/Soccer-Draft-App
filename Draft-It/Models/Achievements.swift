@@ -78,7 +78,7 @@ enum AchievementStore {
         Achievement(id: "poorFinishing", title: "Poor Finishing", detail: "Score the fewest goals in the league in a season.", icon: "xmark.circle.fill", tier: .bronze),
         // Silver: harder season performances and early career milestones.
         Achievement(id: "firstTitle", title: "Champions", detail: "Win the league title.", icon: "trophy.fill", tier: .silver),
-        Achievement(id: "goldenBoot", title: "Golden Boot", detail: "A player scores 15+ league goals.", icon: "soccerball", tier: .silver),
+        Achievement(id: "goldenBoot", title: "Golden Boot", detail: "A player scores 20+ league goals.", icon: "soccerball", tier: .silver),
         Achievement(id: "hundredGoals", title: "Century Club", detail: "Score 100+ league goals in a season.", icon: "number.circle.fill", tier: .silver),
         Achievement(id: "assistKing", title: "Assist King", detail: "A player records 15+ league assists.", icon: "shoe.fill", tier: .silver),
         Achievement(id: "topScorers", title: "Top Scorers", detail: "Score the most goals in the league in a season.", icon: "flame.fill", tier: .silver),
@@ -88,7 +88,7 @@ enum AchievementStore {
         Achievement(id: "titles5", title: "Five-Time Winners", detail: "Win 5 league titles.", icon: "trophy", tier: .silver),
         Achievement(id: "superLeague3", title: "Continental Force", detail: "Win 3 Super Leagues.", icon: "globe.americas.fill", tier: .silver),
         // Gold: standout individual feats and long career milestones.
-        Achievement(id: "goalMachine", title: "Goal Machine", detail: "A player scores 25+ league goals.", icon: "soccerball.fill", tier: .gold),
+        Achievement(id: "goalMachine", title: "Goal Machine", detail: "A player scores 30+ league goals.", icon: "soccerball.fill", tier: .gold),
         Achievement(id: "starCatcher", title: "Star Catcher", detail: "Draft a player rated 95+.", icon: "star.fill", tier: .gold),
         Achievement(id: "eliteManager", title: "Elite Manager", detail: "Draft a manager rated 92+.", icon: "person.fill", tier: .gold),
         Achievement(id: "centurians", title: "Centurians", detail: "Earn 100 points in a single league season.", icon: "100.circle.fill", tier: .gold),
@@ -107,7 +107,7 @@ enum AchievementStore {
         Achievement(id: "unbeaten", title: "Invincibles", detail: "Win the league without a single defeat.", icon: "shield.fill", tier: .gold, isHidden: true),
         Achievement(id: "backToBack", title: "Back-to-Back", detail: "Win the league in consecutive seasons.", icon: "repeat", tier: .gold, isHidden: true),
         Achievement(id: "threepeat", title: "3 Peat", detail: "Win the league three seasons in a row.", icon: "3.circle.fill", tier: .gold, isHidden: true),
-        Achievement(id: "how", title: "How?", detail: "Draw 20+ league games in a single season.", icon: "exclamationmark.triangle.fill", tier: .gold, isHidden: true),
+        Achievement(id: "how", title: "How?", detail: "Draw 25+ league games in a single season.", icon: "exclamationmark.triangle.fill", tier: .gold, isHidden: true),
         Achievement(id: "quadTargets", title: "Win the Double", detail: "Win the league and the Super League in the same season.", icon: "4.circle.fill", tier: .gold, isHidden: true),
         Achievement(id: "legendary", title: "Legendary", detail: "Field a starting lineup of Past Legends.", icon: "crown.circle.fill", tier: .gold, isHidden: true),
         Achievement(id: "who", title: "Who?", detail: "Draft Sebastian Berhalter.", icon: "questionmark.circle.fill", tier: .gold, isHidden: true),
@@ -117,7 +117,7 @@ enum AchievementStore {
     ]
 
     /// The club/league marker used by non-standard player pools.
-    private static let excludedDraftLeagues: Set<String> = ["Past Legends", "Upgraded Players", "Global Superstars"]
+    private static let excludedDraftLeagues: Set<String> = ["Past Legends", "Upgraded Players", "Global Superstars", "Cult Heros", "Future Superstars", "Womens Stars", "Random Bums"]
 
     private static let storeKey = "unlockedAchievements"
 
@@ -169,9 +169,9 @@ enum AchievementStore {
             case "seasonOne":
                 grant(achievement, context.leaguePosition > 0)
             case "goldenBoot":
-                grant(achievement, context.leagueTopScorerGoals >= 15)
+                grant(achievement, context.leagueTopScorerGoals >= 20)
             case "goalMachine":
-                grant(achievement, context.leagueTopScorerGoals >= 25)
+                grant(achievement, context.leagueTopScorerGoals >= 30)
             case "assistKing":
                 grant(achievement, context.leagueTopAssists >= 15)
             case "topOfTable":
@@ -231,7 +231,7 @@ enum AchievementStore {
             case "threepeat":
                 grant(achievement, threePeatChampion(position: context.leaguePosition))
             case "how":
-                grant(achievement, (record?.draws ?? 0) >= 20)
+                grant(achievement, (record?.draws ?? 0) >= 25)
             case "quadTargets":
                 grant(achievement, context.leaguePosition == 1 && context.superLeagueChampion)
             case "amateurs":

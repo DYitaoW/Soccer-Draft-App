@@ -42,9 +42,11 @@ struct CupSeasonView: View {
                         revealedWeeks = weekCount
                         withAnimation { finished = true }
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .padding(.top, 8)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: 10))
+                    .controlSize(.large)
+                    .tint(.green)
+                    .padding(.top, 30)
                 }
 
                 if finished {

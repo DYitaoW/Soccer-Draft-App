@@ -9,16 +9,24 @@ import SwiftUI
 /// Start/Resume/Dynasty actions through closures, and overlays the settings,
 /// career-stats, and midseason-transfer modals.
 struct HomeView: View {
-    let onStart: (Formation, GameMode, Bool, Bool, Bool, Bool) -> Void
+    let onStart: (Formation, GameMode, Bool, Bool, Bool, Bool, Int, Bool, Bool, Bool, Bool, Bool) -> Void
     let onResume: () -> Void
     let onDynastyStart: (GameState) -> Void
 
     @AppStorage("homeSelectedFormation") private var selectedFormationName: String = GameData.formations[0].name
     @AppStorage("homeSelectedMode") private var selectedModeRaw: String = GameMode.normal.rawValue
     @State private var showCareerStats = false
+    @State private var showPlayerPools = false
+    @State private var showSpecialModes = false
+    @AppStorage("homeTransferBudget") private var transferBudgetAmount: Double = 100
     @AppStorage("homeShowRatings") private var showRatings: Bool = true
     @AppStorage("homeShowOtherLeagues") private var showOtherLeagues: Bool = true
     @AppStorage("homeShowPastLegends") private var showPastLegends: Bool = true
+    @AppStorage("homeShowUpgradedPlayers") private var showUpgradedPlayers: Bool = true
+    @AppStorage("homeShowCultHeros") private var showCultHeros: Bool = true
+    @AppStorage("homeShowFutureSuperstars") private var showFutureSuperstars: Bool = true
+    @AppStorage("homeShowWomensStars") private var showWomensStars: Bool = true
+    @AppStorage("homeShowRandomBums") private var showRandomBums: Bool = true
     @AppStorage("homeShowManagers") private var showManagers: Bool = true
     @AppStorage("enableCupCompetitions") private var enableCups = false
     @AppStorage("dynastyMode") private var dynastyMode = true
@@ -89,78 +97,74 @@ struct HomeView: View {
                 
                 // league database settings
                 
-                sectionHeader("Other Leagues & Players")
+                sectionHeader("Player Pools")
 
-                HStack(spacing: 8) {
-                    Button(action: { showOtherLeagues = true }) {
-                        HStack(spacing: 2) {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("On")
+                Button(action: { showPlayerPools = true }) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Other Players & Leagues")
+                                .font(.headline)
+                            Text("Enable additional players and leagues")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
-                        .font(.headline.weight(.bold))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(adaptiveGray)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 5)
+                
+                sectionHeader("Additional Options")
+
+                HStack(spacing: 12) {
+                    Button(action: { withAnimation(.none) { enableCups.toggle() } }) {
+                        HStack(spacing: 5) {
+                            Image(systemName: "trophy.fill")
+                            Text("Cups")
+                                .font(.headline.weight(.bold))
+                            Spacer()
+                            Image(systemName: enableCups ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(enableCups ? .green : .red)
+                        }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(showOtherLeagues ? Color.green.opacity(tintOpacity) : adaptiveGray)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 18)
+                        .background(enableCups ? Color.green.opacity(tintOpacity) : Color.red.opacity(tintOpacity))
                         .foregroundColor(.primary)
-                        .overlay(showOtherLeagues ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2) : nil)
+                        .overlay(enableCups
+                            ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2)
+                            : RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    Button(action: { showOtherLeagues = false }) {
-                      
-                        HStack(spacing: 2) {
-                            Image(systemName: "xmark.circle.fill")
-                            Text("Off")
+
+                    Button(action: { withAnimation(.none) { showManagers.toggle() } }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "person.fill")
+                            Text("Managers")
+                                .font(.headline.weight(.bold))
+                            Spacer()
+                            Image(systemName: showManagers ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(showManagers ? .green : .red)
                         }
-                        .font(.headline.weight(.bold))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(!showOtherLeagues ? Color.red.opacity(tintOpacity) : adaptiveGray)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 18)
+                        .background(showManagers ? Color.green.opacity(tintOpacity) : Color.red.opacity(tintOpacity))
                         .foregroundColor(.primary)
-                        .overlay(!showOtherLeagues ? RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2) : nil)
+                        .overlay(showManagers
+                            ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2)
+                            : RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
                 .padding(.horizontal, 4)
-                .padding(.bottom, 5)
-                
-                Text("Adds other famous teams & players outside England")
-                    .font(.system(size: 12).weight(.light))
-
-                sectionHeader("Past Legends & Upgraded Players")
-
-                HStack(spacing: 8) {
-                    Button(action: { showPastLegends = true }) {
-                        HStack(spacing: 2) {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("On")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(showPastLegends ? Color.green.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(showPastLegends ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    Button(action: { showPastLegends = false }) {
-                        HStack(spacing: 2) {
-                            Image(systemName: "xmark.circle.fill")
-                            Text("Off")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(!showPastLegends ? Color.red.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(!showPastLegends ? RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-                .padding(.horizontal, 4)
-                .padding(.bottom, 5)
-                
-                Text("Adds historical legendary players and upgraded versions of today's stars")
-                    .font(.system(size: 12).weight(.light))
+                .padding(.bottom, 0)
                 
                 // formation view part
 
@@ -182,122 +186,56 @@ struct HomeView: View {
                 }
 
                 MiniFieldPreview(formation: selectedFormation)
-                    .frame(height: 180)
+                    .frame(height: 160)
                     .padding(.top, 12)
                     .padding(.horizontal, 0)
 
                 sectionHeader("Game Mode")
 
-                HStack(spacing: 8) {
-                    ForEach([GameMode.easy, .normal, .hard], id: \.self) { mode in
-                        modeButton(mode)
+                Button(action: { showSpecialModes = true }) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(selectedMode.displayName)
+                                .font(.headline)
+                            Text(selectedMode.fullDescription)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
                     }
+                    .padding()
+                    .background(adaptiveGray)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 4)
                 .padding(.bottom, 12)
 
-                HStack(spacing: 8) {
-                    ForEach([GameMode.mode38, .positionsFirst], id: \.self) { mode in
-                        modeButton(mode)
+                if selectedMode == .transferBudget {
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("Transfer Budget")
+                                .font(.headline)
+                            Spacer()
+                            Text("$\(Int(transferBudgetAmount))M")
+                                .font(.headline).fontWeight(.bold)
+                                .foregroundColor(.cyan)
+                        }
+                        Slider(value: $transferBudgetAmount, in: 100...1000, step: 25)
+                            .tint(.cyan)
+                        HStack {
+                            Text("$100M")
+                                .font(.caption).foregroundColor(.secondary)
+                            Spacer()
+                            Text("$1B")
+                                .font(.caption).foregroundColor(.secondary)
+                        }
                     }
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 12)
                 }
-
-                Color.clear.frame(height: 4)
-
-                sectionHeader("Show Ratings")
-
-                HStack(spacing: 8) {
-                    Button(action: { showRatings = true }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "eye.fill")
-                            Text("On")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(showRatings ? Color.green.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(showRatings ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    Button(action: { showRatings = false }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "eye.slash")
-                            Text("Off")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(!showRatings ? Color.red.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(!showRatings ? RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-                .padding(.horizontal, 4)
-
-                sectionHeader("Cups")
-
-                HStack(spacing: 8) {
-                    Button(action: { enableCups = true }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "trophy.fill")
-                            Text("On")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(enableCups ? Color.green.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(enableCups ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    Button(action: { enableCups = false }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "xmark.circle.fill")
-                            Text("Off")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(!enableCups ? Color.red.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(!enableCups ? RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-                .padding(.horizontal, 4)
-
-                sectionHeader("Managers")
-
-                HStack(spacing: 8) {
-                    Button(action: { showManagers = true }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "person.fill")
-                            Text("On")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(showManagers ? Color.green.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(showManagers ? RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    Button(action: { showManagers = false }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "person.slash")
-                            Text("Off")
-                        }
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(!showManagers ? Color.red.opacity(tintOpacity) : adaptiveGray)
-                        .foregroundColor(.primary)
-                        .overlay(!showManagers ? RoundedRectangle(cornerRadius: 8).stroke(Color.red, lineWidth: 2) : nil)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-                .padding(.horizontal, 4)
 
                 if hasSavedGame {
                     HStack(spacing: 12) {
@@ -315,7 +253,7 @@ struct HomeView: View {
                         .tint(.green)
 
                         Button(action: {
-                            onStart(selectedFormation, selectedMode, showRatings, showOtherLeagues, showPastLegends, showManagers)
+                            onStart(selectedFormation, selectedMode, showRatings, showOtherLeagues, showPastLegends, showManagers, Int(transferBudgetAmount), showUpgradedPlayers, showCultHeros, showFutureSuperstars, showWomensStars, showRandomBums)
                         }) {
                             Text("Start New Game")
                                 .frame(maxWidth: .infinity)
@@ -330,7 +268,7 @@ struct HomeView: View {
                     .padding(.top, 25)
                 } else {
                     Button(action: {
-                        onStart(selectedFormation, selectedMode, showRatings, showOtherLeagues, showPastLegends, showManagers)
+                        onStart(selectedFormation, selectedMode, showRatings, showOtherLeagues, showPastLegends, showManagers, Int(transferBudgetAmount), showUpgradedPlayers, showCultHeros, showFutureSuperstars, showWomensStars, showRandomBums)
                     }) {
                         Text("Start New Game")
                             .frame(maxWidth: .infinity)
@@ -339,7 +277,7 @@ struct HomeView: View {
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.roundedRectangle(radius: 10))
                     .controlSize(.large)
-                    .padding(.top, 25)
+                    .padding(.top, 5)
                     .tint(.green)
                 }
 
@@ -381,9 +319,27 @@ struct HomeView: View {
                 CareerStatsView(onDismiss: { showCareerStats = false })
                     .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
+            if showPlayerPools {
+                adaptiveOverlay
+                    .ignoresSafeArea()
+                    .onTapGesture { showPlayerPools = false }
+
+                PlayerPoolsView(onDismiss: { showPlayerPools = false })
+                    .transition(.scale(scale: 0.85).combined(with: .opacity))
+            }
+            if showSpecialModes {
+                adaptiveOverlay
+                    .ignoresSafeArea()
+                    .onTapGesture { showSpecialModes = false }
+
+                SpecialModesView(selectedModeRaw: $selectedModeRaw, onDismiss: { showSpecialModes = false })
+                    .transition(.scale(scale: 0.85).combined(with: .opacity))
+            }
         }
         .animation(.easeOut(duration: 0.2), value: showSettings)
         .animation(.easeOut(duration: 0.2), value: showCareerStats)
+        .animation(.easeOut(duration: 0.2), value: showPlayerPools)
+        .animation(.easeOut(duration: 0.2), value: showSpecialModes)
         .overlay {
             if showDynastyTransfer {
                 adaptiveOverlay
@@ -426,7 +382,8 @@ struct HomeView: View {
     /// midseason transfer modal with a random transfer budget.
     private func startDynasty() {
         guard let save = DynastySave.load() else { return }
-        let gs = GameState(formation: save.formation, mode: .normal, showRatings: true, showPremierLeague: true, showOtherLeagues: true, showGlobalSuperstars: true, showPastLegends: true)
+        let mode = GameMode(rawValue: save.gameModeRaw ?? "") ?? .normal
+        let gs = GameState(formation: save.formation, mode: mode, showRatings: true, showPremierLeague: true, showOtherLeagues: true, showGlobalSuperstars: true, showPastLegends: true, transferBudgetAmount: save.transferBudgetAmount)
         gs.assignedPlayers = save.assignedPlayers
         gs.substitutes = save.substitutes
         gs.selectedManager = save.manager
@@ -463,47 +420,6 @@ struct HomeView: View {
         .padding(.bottom, 8)
         .padding(.leading, 2)
     }
-
-    /// Returns the accent color used to style a game mode's selection state.
-    private func modeColor(_ mode: GameMode) -> Color {
-        switch mode {
-        case .easy: return .green
-        case .normal: return .blue
-        case .hard: return .red
-        case .mode38: return .purple
-        case .positionsFirst: return .orange
-        }
-    }
-
-    /// Short subtitle describing the reroll rules of a game mode.
-    private func modeDescription(for mode: GameMode) -> String {
-        switch mode {
-        case .easy: return "3 total rerolls"
-        case .normal: return "1 total reroll"
-        case .hard: return "No rerolls"
-        case .mode38: return "Random Teams"
-        case .positionsFirst: return "Pick by position"
-        }
-    }
-
-    /// One selectable game-mode button (difficulty or special mode).
-    private func modeButton(_ mode: GameMode) -> some View {
-        Button(action: { selectedModeRaw = mode.rawValue }) {
-            VStack(spacing: 2) {
-                Text(mode.displayName)
-                    .font(.headline.weight(.bold))
-                Text(modeDescription(for: mode))
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(selectedMode == mode ? modeColor(mode).opacity(tintOpacity) : adaptiveGray)
-            .foregroundColor(.primary)
-            .overlay(selectedMode == mode ? RoundedRectangle(cornerRadius: 8).stroke(modeColor(mode), lineWidth: 2) : nil)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
-    }
 }
 
 /// Small non-interactive pitch preview showing the selected formation's slot
@@ -515,15 +431,41 @@ struct MiniFieldPreview: View {
     var body: some View {
         GeometryReader { geo in
             let cs = min(geo.size.width, geo.size.height) * 0.11
+            let w = geo.size.width
+            let h = geo.size.height
             ZStack {
+                // Base green
                 Color(red: 0.05, green: 0.38, blue: 0.08)
 
+                // Grass cut lines (lighter green horizontal stripes)
+                ForEach(0..<6, id: \.self) { i in
+                    Rectangle()
+                        .fill(Color(red: 0.06, green: 0.42, blue: 0.09))
+                        .frame(width: w, height: h / 6)
+                        .position(x: w / 2, y: h / 12 + h / 6 * CGFloat(i))
+                }
+
+                // Border (thicker)
                 Rectangle()
-                    .strokeBorder(Color.white.opacity(0.3), lineWidth: 1)
+                    .strokeBorder(Color.white.opacity(0.35), lineWidth: 2)
+
+                // Center line (thicker)
                 Rectangle()
-                    .fill(Color.white.opacity(0.25))
-                    .frame(height: 1)
-                    .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                    .fill(Color.white.opacity(0.3))
+                    .frame(width: w, height: 2)
+                    .position(x: w / 2, y: h / 2)
+
+                // Center circle
+                Circle()
+                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
+                    .frame(width: w * 0.25, height: h * 0.25)
+                    .position(x: w / 2, y: h / 2)
+
+                // Center dot
+                Circle()
+                    .fill(Color.white.opacity(0.3))
+                    .frame(width: 6, height: 6)
+                    .position(x: w / 2, y: h / 2)
 
                 ForEach(formation.slots.indices, id: \.self) { i in
                     let slot = formation.slots[i]
@@ -550,5 +492,5 @@ struct MiniFieldPreview: View {
 }
 
 #Preview {
-    HomeView(onStart: { _, _, _, _, _, _ in }, onResume: {}, onDynastyStart: { _ in })
+    HomeView(onStart: { _, _, _, _, _, _, _, _, _, _, _, _ in }, onResume: {}, onDynastyStart: { _ in })
 }

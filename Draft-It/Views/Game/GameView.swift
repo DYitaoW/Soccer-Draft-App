@@ -34,14 +34,22 @@ struct GameView: View {
     @State private var showCupDraw = false
     @State private var cupCompetitionType: CupCompetitionType?
     @State private var seasonResult: SeasonSimulationResult?
+    @State private var showBudgetBust = false
     @State private var regularDraftId: UUID?
     @State private var regularSeasonPlayerStats: [PlayerSeasonStats] = []
     @State private var showRegularSeasonEnd = false
     @State private var newlyUnlockedAchievements: [Achievement] = []
+    @State private var managerCandidates: [Manager] = []
+    @State private var managerDisplayNames: [String] = Array(repeating: "", count: 3)
+    @State private var managerSlotLocked: [Bool] = Array(repeating: false, count: 3)
+    @State private var managerRevealedSlots = 0
+    @State private var managerAnimationDone = false
+    @State private var managerAnimationId = 0
 
     @State private var seasonQualifiedForSuperLeague = false
     @AppStorage("enableCupCompetitions") private var enableCups = false
     @AppStorage("dynastyMode") private var dynastyMode = true
+    @AppStorage("advancedManagers") private var advancedManagers = true
     @Environment(\.colorScheme) private var colorScheme
 
     private var adaptiveOverlay: Color { adaptiveOverlayColor(for: colorScheme) }
@@ -168,7 +176,9 @@ struct GameView: View {
                                 substitutes: gameState.substitutes,
                                 formation: gameState.selectedFormation,
                                 manager: gameState.selectedManager,
-                                seasonCount: seasonCount
+                                seasonCount: seasonCount,
+                                gameMode: gameState.gameMode,
+                                transferBudgetAmount: gameState.transferBudget
                             )
                         }
                     }
@@ -229,7 +239,8 @@ struct GameView: View {
                 substitutes: gameState.substitutes,
                 manager: gameState.selectedManager,
                 regularDraftId: regularDraftId,
-                onRestart: onRestart
+                onRestart: onRestart,
+                playerGameState: gameState
             )
 
         } else if showRegularSeasonEnd, let result = seasonResult {
@@ -303,6 +314,35 @@ struct GameView: View {
                             }
                         }
                     }
+                    .onChange(of: gameState.transferBudgetRemaining) {
+                        checkBudgetBust()
+                    }
+                    .alert("Budget Busted!", isPresented: $showBudgetBust) {
+                        Button("Back to Home") {
+                            SavedGame.clear()
+                            onRestart()
+                        }
+                    } message: {
+                        Text("You've run out of transfer budget and can't afford any remaining players. Better luck next time!")
+                    }
+        }
+    }
+
+    /// Checks whether the player is "busted" — still has empty starter slots but
+    /// cannot afford any eligible player from the full pool.
+    private func checkBudgetBust() {
+        guard gameState.gameMode == .transferBudget else { return }
+        guard !gameState.isComplete else { return }
+        let openPositions = Set(gameState.selectedFormation.slots.enumerated().compactMap { idx, slot in
+            gameState.assignedPlayers[idx] == nil ? slot.position : nil
+        })
+        let eligible = GameData.players.filter { player in
+            !gameState.usedPlayerIds.contains(player.id)
+            && player.effectivePositions.contains(where: { openPositions.contains($0) })
+            && gameState.transferValue(for: player) <= gameState.transferBudgetRemaining
+        }
+        if eligible.isEmpty {
+            showBudgetBust = true
         }
     }
 
@@ -486,10 +526,16 @@ struct GameView: View {
                 showOtherLeagues: gameState.showOtherLeagues,
                 showGlobalSuperstars: gameState.showGlobalSuperstars,
                 showPastLegends: gameState.showPastLegends,
+                showUpgradedPlayers: gameState.showUpgradedPlayers,
+                showCultHeros: gameState.showCultHeros,
+                showFutureSuperstars: gameState.showFutureSuperstars,
+                showWomensStars: gameState.showWomensStars,
+                showRandomBums: gameState.showRandomBums,
                 minRating: 0,
                 onSelect: { player in
                     randomizerCache[randomizerKey(for: editingSlotPosition)] = nil
                     gameState.assignPlayer(player, toSlot: editingSlotIndex)
+                    gameState.spendBudget(for: player)
                     SavedGame.save(gameState)
                     withAnimation { showRandomizer = false }
                 },
@@ -498,7 +544,10 @@ struct GameView: View {
                 initialCandidates: randomizerCache[randomizerKey(for: editingSlotPosition)],
                 onCandidatesChanged: { candidates in
                     randomizerCache[randomizerKey(for: editingSlotPosition)] = candidates
-                }
+                },
+                transferBudgetRemaining: gameState.transferBudgetRemaining,
+                transferValue: gameState.isTransferBudget ? { player in gameState.transferValue(for: player) } : nil,
+                gameMode: gameState.gameMode
             )
             .transition(.scale(scale: 0.85).combined(with: .opacity))
         }
@@ -519,10 +568,16 @@ struct GameView: View {
                 showOtherLeagues: gameState.showOtherLeagues,
                 showGlobalSuperstars: gameState.showGlobalSuperstars,
                 showPastLegends: gameState.showPastLegends,
+                showUpgradedPlayers: gameState.showUpgradedPlayers,
+                showCultHeros: gameState.showCultHeros,
+                showFutureSuperstars: gameState.showFutureSuperstars,
+                showWomensStars: gameState.showWomensStars,
+                showRandomBums: gameState.showRandomBums,
                 minRating: 0,
                 onSelect: { player in
                     randomizerCache[randomizerKey(for: nil)] = nil
                     gameState.addSubstitute(player, at: editingSubIndex)
+                    gameState.spendBudget(for: player)
                     SavedGame.save(gameState)
                     withAnimation { showSubRandomizer = false }
                 },
@@ -531,7 +586,10 @@ struct GameView: View {
                 initialCandidates: randomizerCache[randomizerKey(for: nil)],
                 onCandidatesChanged: { candidates in
                     randomizerCache[randomizerKey(for: nil)] = candidates
-                }
+                },
+                transferBudgetRemaining: gameState.transferBudgetRemaining,
+                transferValue: gameState.isTransferBudget ? { player in gameState.transferValue(for: player) } : nil,
+                gameMode: gameState.gameMode
             )
             .transition(.scale(scale: 0.85).combined(with: .opacity))
         }
@@ -577,7 +635,17 @@ struct GameView: View {
                 }
             }.padding(.bottom, 5)
 
-            
+            if gameState.isTransferBudget && phase == .drafting {
+                HStack {
+                    Text("Budget:")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                    Text("$\(gameState.transferBudgetRemaining)M")
+                        .font(.caption.bold())
+                        .foregroundColor(gameState.transferBudgetRemaining > 20 ? .green : .red)
+                    Spacer()
+                }
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 0)
@@ -647,27 +715,133 @@ struct GameView: View {
 
     // MARK: - Manager Reveal
 
+    /// Returns a color for the manager's overall rating.
+    private func managerRatingColor(_ rating: Int) -> Color {
+        if rating >= 88 { return .purple }
+        if rating >= 81 { return .green }
+        if rating >= 76 { return .orange }
+        return .red
+    }
+
+    /// Returns a color for the manager's tendency.
+    private func managerTendencyColor(_ tendency: ManagerTendency) -> Color {
+        switch tendency {
+        case .attackMinded: return .red
+        case .defensive: return .blue
+        case .balanced: return .green
+        case .counterAttack: return .orange
+        case .possession: return .purple
+        case .highPress: return .yellow
+        }
+    }
+
     /// Card showing the assigned manager (or a spinning reveal before it is set).
     private var managerRevealCard: some View {
         VStack(spacing: 20) {
-            Text("Your Manager")
-                .font(.title2).fontWeight(.bold)
+            if advancedManagers && !managerRevealed {
+                Text("Choose Your Manager")
+                    .font(.title2).fontWeight(.bold)
 
-            if managerRevealed, let mgr = gameState.selectedManager {
-                VStack(spacing: 8) {
-                    HStack(spacing: 4) {
-                        Text(mgr.name)
-                            .font(.title3).fontWeight(.semibold)
-                        Text("  (\(mgr.rating))")
-                            .fontWeight(.bold)
-                            .foregroundColor(.yellow)
+                if managerAnimating {
+                    // Cycling animation showing random manager names in 3 slots
+                    VStack(spacing: 12) {
+                        ForEach(0..<3, id: \.self) { i in
+                            if i < managerCandidates.count && !managerSlotLocked[i] {
+                                // Cycling slot
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(managerDisplayNames[i].isEmpty ? "???" : managerDisplayNames[i])
+                                            .font(.headline).fontWeight(.semibold)
+                                        Text("???")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                    Text("?")
+                                        .font(.title3).fontWeight(.bold)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            } else if i < managerCandidates.count && managerSlotLocked[i] {
+                                // Locked-in slot showing manager
+                                let mgr = managerCandidates[i]
+                                Button(action: {
+                                    selectManager(mgr)
+                                }) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(mgr.name)
+                                                .font(.headline).fontWeight(.semibold)
+                                            Text(mgr.tendency.rawValue)
+                                                .font(.caption)
+                                                .foregroundColor(managerTendencyColor(mgr.tendency))
+                                        }
+                                        Spacer()
+                                        Text("\(mgr.rating)")
+                                            .font(.title3).fontWeight(.bold)
+                                            .foregroundColor(managerRatingColor(mgr.rating))
+                                    }
+                                    .padding()
+                                    .background(Color(.systemGray6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                } else if managerAnimationDone && !managerCandidates.isEmpty {
+                    // All 3 managers revealed
+                    VStack(spacing: 12) {
+                        ForEach(managerCandidates) { mgr in
+                            Button(action: {
+                                selectManager(mgr)
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(mgr.name)
+                                            .font(.headline).fontWeight(.semibold)
+                                        Text(mgr.tendency.rawValue)
+                                            .font(.caption)
+                                            .foregroundColor(managerTendencyColor(mgr.tendency))
+                                    }
+                                    Spacer()
+                                    Text("\(mgr.rating)")
+                                        .font(.title3).fontWeight(.bold)
+                                        .foregroundColor(managerRatingColor(mgr.rating))
+                                    }
+                                    .padding()
+                                    .background(Color(.systemGray6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                } else {
+                    Text("Your Manager")
+                        .font(.title2).fontWeight(.bold)
+
+                    if managerRevealed, let mgr = gameState.selectedManager {
+                        VStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Text(mgr.name)
+                                    .font(.title3).fontWeight(.semibold)
+                                Text("  (\(mgr.rating))")
+                                    .fontWeight(.bold)
+                                    .foregroundColor(managerRatingColor(mgr.rating))
+                            }
+                            Text(mgr.tendency.rawValue)
+                                .font(.caption)
+                                .foregroundColor(managerTendencyColor(mgr.tendency))
+                        }
+                    } else {
+                        Text(managerDisplayName)
+                            .font(.title3)
+                            .foregroundColor(.secondary)
                     }
                 }
-            } else {
-                Text(managerDisplayName)
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-            }
         }
         .padding(25)
         .background(Color(.systemBackground))
@@ -699,25 +873,52 @@ struct GameView: View {
     private func startManagerReveal() {
         managerAnimating = true
         managerRevealed = false
+        managerAnimationDone = false
+        managerDisplayNames = Array(repeating: "", count: 3)
+        managerSlotLocked = Array(repeating: false, count: 3)
+        managerRevealedSlots = 0
+        managerAnimationId += 1
+        let currentId = managerAnimationId
         let pool = managerPool
         guard !pool.isEmpty else { return }
 
-        let finalMgr = pool.randomElement()!
+        if advancedManagers {
+            // Pick 3 unique random managers
+            var candidates: [Manager] = []
+            var available = pool
+            for _ in 0..<min(3, available.count) {
+                let idx = Int.random(in: 0..<available.count)
+                candidates.append(available.remove(at: idx))
+            }
+            managerCandidates = candidates
 
-        guard !UserDefaults.standard.bool(forKey: "fastMode") else {
-            managerDisplayName = finalMgr.name
-            managerAnimating = false
-            managerRevealed = true
-            gameState.managerRevealed = true
-            gameState.selectedManager = finalMgr
-            SavedGame.save(gameState)
-            autoCloseManagerReveal()
-            return
-        }
+            // Skip animation in fast mode
+            guard !UserDefaults.standard.bool(forKey: "fastMode") else {
+                for i in 0..<candidates.count {
+                    managerDisplayNames[i] = candidates[i].name
+                    managerSlotLocked[i] = true
+                }
+                managerRevealedSlots = candidates.count
+                managerAnimating = false
+                managerAnimationDone = true
+                return
+            }
 
-        var count = 0
-        func cycle() {
-            guard count < 25 else {
+            // Start cycling animation for each slot
+            for slot in 0..<candidates.count {
+                startManagerCycling(slot: slot, id: currentId)
+            }
+            // Lock in each slot with delay
+            for slot in 0..<candidates.count {
+                let delay = 1.0 + Double(slot) * 0.5
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    lockInManager(slot: slot, id: currentId)
+                }
+            }
+        } else {
+            let finalMgr = pool.randomElement()!
+
+            guard !UserDefaults.standard.bool(forKey: "fastMode") else {
                 managerDisplayName = finalMgr.name
                 managerAnimating = false
                 managerRevealed = true
@@ -727,11 +928,59 @@ struct GameView: View {
                 autoCloseManagerReveal()
                 return
             }
-            managerDisplayName = pool.randomElement()?.name ?? "???"
-            count += 1
+
+            var count = 0
+            func cycle() {
+                guard count < 25 else {
+                    managerDisplayName = finalMgr.name
+                    managerAnimating = false
+                    managerRevealed = true
+                    gameState.managerRevealed = true
+                    gameState.selectedManager = finalMgr
+                    SavedGame.save(gameState)
+                    autoCloseManagerReveal()
+                    return
+                }
+                managerDisplayName = pool.randomElement()?.name ?? "???"
+                count += 1
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08, execute: cycle)
+            }
+            cycle()
+        }
+    }
+
+    /// Commits the user's chosen manager from the 3-manager selection.
+    private func selectManager(_ mgr: Manager) {
+        gameState.selectedManager = mgr
+        gameState.managerRevealed = true
+        managerRevealed = true
+        SavedGame.save(gameState)
+        // Immediately close for advanced mode (no delay)
+        withAnimation { showManagerReveal = false }
+    }
+
+    /// Cycles random manager names through a slot every 0.08s until it locks in.
+    private func startManagerCycling(slot: Int, id: Int) {
+        let pool = managerPool
+        func cycle() {
+            guard id == managerAnimationId, slot < managerCandidates.count, !managerSlotLocked[slot] else { return }
+            managerDisplayNames[slot] = pool.randomElement()?.name ?? "???"
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.08, execute: cycle)
         }
         cycle()
+    }
+
+    /// Reveals the final manager for a slot and marks it locked; when all
+    /// slots are locked the overall animation is marked complete.
+    private func lockInManager(slot: Int, id: Int) {
+        guard id == managerAnimationId, slot < managerCandidates.count else { return }
+        managerDisplayNames[slot] = managerCandidates[slot].name
+        managerSlotLocked[slot] = true
+        managerRevealedSlots += 1
+        if managerRevealedSlots == managerCandidates.count {
+            managerAnimating = false
+            managerAnimationDone = true
+        }
     }
 
     /// Closes the manager reveal popup shortly after the manager is committed.

@@ -89,6 +89,11 @@ struct MidseasonTransferView: View {
                     showOtherLeagues: gameState.showOtherLeagues,
                     showGlobalSuperstars: gameState.showGlobalSuperstars,
                     showPastLegends: gameState.showPastLegends,
+                    showUpgradedPlayers: gameState.showUpgradedPlayers,
+                    showCultHeros: gameState.showCultHeros,
+                    showFutureSuperstars: gameState.showFutureSuperstars,
+                    showWomensStars: gameState.showWomensStars,
+                    showRandomBums: gameState.showRandomBums,
                     minRating: 0,
                     onSelect: { player in
                         transfer(to: player, at: selectedSlotIndex!)
@@ -99,7 +104,10 @@ struct MidseasonTransferView: View {
                         randomizerPool = randomCandidates(for: pos)
                     },
                     initialCandidates: nil,
-                    onCandidatesChanged: nil
+                    onCandidatesChanged: nil,
+                    transferBudgetRemaining: gameState.transferBudgetRemaining,
+                    transferValue: gameState.isTransferBudget ? { player in gameState.transferValue(for: player) } : nil,
+                    gameMode: gameState.gameMode
                 )
                 .transition(.scale.combined(with: .opacity))
             }

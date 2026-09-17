@@ -23,10 +23,10 @@ struct ContentView: View {
                 .environmentObject(gs)
             } else {
                 HomeView(
-                    onStart: { formation, mode, showRatings, showOther, showLegends, showManagers in
+                    onStart: { formation, mode, showRatings, showOther, showLegends, showManagers, budgetAmount, showUpgraded, showCult, showFuture, showWomens, showBums in
                         SavedGame.clear()
                         DynastySave.clear()
-                        let gs = GameState(formation: formation, mode: mode, showRatings: showRatings, showPremierLeague: true, showOtherLeagues: showOther, showGlobalSuperstars: showOther, showPastLegends: showLegends)
+                        let gs = GameState(formation: formation, mode: mode, showRatings: showRatings, showPremierLeague: true, showOtherLeagues: showOther, showGlobalSuperstars: showOther, showPastLegends: showLegends, showUpgradedPlayers: showUpgraded, showCultHeros: showCult, showFutureSuperstars: showFuture, showWomensStars: showWomens, showRandomBums: showBums, transferBudgetAmount: budgetAmount)
                         if !showManagers {
                             gs.selectedManager = nil
                             gs.managerRevealed = true

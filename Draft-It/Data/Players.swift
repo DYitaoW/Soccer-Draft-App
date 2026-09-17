@@ -27,14 +27,13 @@ let _players: [Player] = [
     Player(name: "Myles Lewis-Skelly", ovrRating: 78, positions: [.LB], team: "Arsenal", league: "Premier League"),
     Player(name: "Christos Tzolis", ovrRating: 79, positions: [.LW,.LM], team: "Arsenal", league: "Premier League"),
     Player(name: "Christian Mosquera", ovrRating: 78, positions: [.CB], team: "Arsenal", league: "Premier League"),
-    Player(name: "Ethan Nwaneri", ovrRating: 75, positions: [.CAM,.CM], team: "Arsenal", league: "Premier League"),
+    //Player(name: "Ethan Nwaneri", ovrRating: 75, positions: [.CAM,.CM], team: "Arsenal", league: "Premier League"), LOAN
     Player(name: "David Raya", ovrRating: 87, positions: [.GK], team: "Arsenal", league: "Premier League"),
     Player(name: "Ben White", ovrRating: 80, positions: [.RB,.CB], team: "Arsenal", league: "Premier League"),
     Player(name: "Max Dowman", ovrRating: 73, positions: [.CAM,.CM], team: "Arsenal", league: "Premier League"),
     Player(name: "Mikel Merino", ovrRating: 83, positions: [.CM,.CDM], team: "Arsenal", league: "Premier League"),
     Player(name: "Fabio Vieira", ovrRating: 79, positions: [.CAM,.CM], team: "Arsenal", league: "Premier League"),
     Player(name: "Gabriel Jesus", ovrRating: 78, positions: [.ST,.LW,.RW], team: "Arsenal", league: "Premier League"),
-    //Player(name: "Reiss Nelson", ovrRating: 74, positions: [.RW,.LW], team: "Arsenal", league: "Premier League"),
     Player(name: "Illan Meslier", ovrRating: 78, positions: [.GK], team: "Arsenal", league: "Premier League"),
     Player(name: "Christian Norgaard", ovrRating: 79, positions: [.CDM,.CM], team: "Arsenal", league: "Premier League"),
     Player(name: "Kepa Arrizabalaga", ovrRating: 80, positions: [.GK], team: "Arsenal", league: "Premier League"),
@@ -81,7 +80,7 @@ let _players: [Player] = [
     Player(name: "Tammy Abraham", ovrRating: 77, positions: [.ST], team: "Aston Villa", league: "Premier League"),
     Player(name: "Lamare Bogarde", ovrRating: 76, positions: [.CM], team: "Aston Villa", league: "Premier League"),
     Player(name: "Emiliano Buendia", ovrRating: 79, positions: [.CAM,.LW], team: "Aston Villa", league: "Premier League"),
-    Player(name: "Leon Bailey", ovrRating: 78, positions: [.RW,.LW], team: "Aston Villa", league: "Premier League"),
+    //Player(name: "Leon Bailey", ovrRating: 78, positions: [.RW,.LW], team: "Aston Villa", league: "Premier League"),
     Player(name: "John McGinn", ovrRating: 83, positions: [.CM,.LM], team: "Aston Villa", league: "Premier League"),
     Player(name: "Emiliano Martinez", ovrRating: 84, positions: [.GK], team: "Aston Villa", league: "Premier League"),
     Player(name: "Alysson", ovrRating: 73, positions: [.GK], team: "Aston Villa", league: "Premier League"),
@@ -152,11 +151,12 @@ let _players: [Player] = [
     Player(name: "Jaouen Hadjam", ovrRating: 73, positions: [.LB], team: "Brighton", league: "Premier League"),
     Player(name: "Pascal Gross", ovrRating: 78, positions: [.CM,.CAM,.RB], team: "Brighton", league: "Premier League"),
     Player(name: "Jason Steele", ovrRating: 78, positions: [.GK], team: "Brighton", league: "Premier League"),
+    Player(name: "Femi Azeez", ovrRating: 75, positions: [.RM], team: "Brighton", league: "Premier League"),
+    Player(name: "Chema Andres", ovrRating: 73, positions: [.CDM], team: "Brighton", league: "Premier League"),
 
     // Chelsea
     Player(name: "Morgan Rogers", ovrRating: 85, positions: [.CAM,.LW], team: "Chelsea", league: "Premier League"),
     Player(name: "Cole Palmer", ovrRating: 87, positions: [.CAM,.RW], team: "Chelsea", league: "Premier League"),
-    Player(name: "Enzo Fernandez", ovrRating: 86, positions: [.CM,.CAM], team: "Chelsea", league: "Premier League"),
     Player(name: "Moises Caicedo", ovrRating: 88, positions: [.CDM,.CM], team: "Chelsea", league: "Premier League"),
     Player(name: "Joao Pedro", ovrRating: 84, positions: [.ST,.CAM], team: "Chelsea", league: "Premier League"),
     Player(name: "Estevao Willian", ovrRating: 81, positions: [.RW,.LW], team: "Chelsea", league: "Premier League"),
@@ -173,22 +173,21 @@ let _players: [Player] = [
     Player(name: "Wesley Fofana", ovrRating: 80, positions: [.CB], team: "Chelsea", league: "Premier League"),
    // Player(name: "Liam Delap", ovrRating: 71, positions: [.ST], team: "Chelsea", league: "Premier League"),
     Player(name: "Emmanuel Emegha", ovrRating: 76, positions: [.ST], team: "Chelsea", league: "Premier League"),
-    Player(name: "Mike Penders", ovrRating: 74, positions: [.GK], team: "Chelsea", league: "Premier League"),
-    Player(name: "Josh Acheampong", ovrRating: 73, positions: [.CB], team: "Chelsea", league: "Premier League"),
-    Player(name: "Robert Sanchez", ovrRating: 82, positions: [.GK], team: "Chelsea", league: "Premier League"),
+    Player(name: "Mike Penders", ovrRating: 77, positions: [.GK], team: "Chelsea", league: "Premier League"),
+    Player(name: "Josh Acheampong", ovrRating: 76, positions: [.CB], team: "Chelsea", league: "Premier League"),
+    //Player(name: "Robert Sanchez", ovrRating: 82, positions: [.GK], team: "Chelsea", league: "Premier League"), LOAN
     Player(name: "Romeo Lavia", ovrRating: 79, positions: [.CDM,.CM], team: "Chelsea", league: "Premier League"),
    // Player(name: "Mamadou Sarr", ovrRating: 75, positions: [.CB], team: "Chelsea", league: "Premier League"), LOAN
-    Player(name: "Tosin Adarabioyo", ovrRating: 80, positions: [.CB], team: "Chelsea", league: "Premier League"),
-    Player(name: "Filip Jorgensen", ovrRating: 78, positions: [.GK], team: "Chelsea", league: "Premier League"),
-    Player(name: "Dario Essugo", ovrRating: 75, positions: [.CDM,.CM], team: "Chelsea", league: "Premier League"),
-    Player(name: "Marc Guiu", ovrRating: 74, positions: [.ST], team: "Chelsea", league: "Premier League"),
+    // Player(name: "Filip Jorgensen", ovrRating: 78, positions: [.GK], team: "Chelsea", league: "Premier League"), laon
+     // Player(name: "Dario Essugo", ovrRating: 75, positions: [.CDM,.CM], team: "Chelsea", league: "Premier League"), loan
+    //Player(name: "Marc Guiu", ovrRating: 74, positions: [.ST], team: "Chelsea", league: "Premier League"),
     Player(name: "Aaron Anselmino", ovrRating: 73, positions: [.CB], team: "Chelsea", league: "Premier League"),
     //Player(name: "Caleb Wiley", ovrRating: 74, positions: [.LB], team: "Chelsea", league: "Premier League"), LOAN
-    Player(name: "David Datro Fofana", ovrRating: 76, positions: [.ST], team: "Chelsea", league: "Premier League"),
+   // Player(name: "David Datro Fofana", ovrRating: 76, positions: [.ST], team: "Chelsea", league: "Premier League"),
     Player(name: "Gabriel Slonina", ovrRating: 71, positions: [.GK], team: "Chelsea", league: "Premier League"),
     Player(name: "Maxence Lacroix", ovrRating: 83, positions: [.CB], team: "Chelsea", league: "Premier League"),
     Player(name: "Danny Welbeck", ovrRating: 82, positions: [.ST], team: "Chelsea", league: "Premier League"),
-    Player(name: "Mykhailo Mudryk", ovrRating: 75, positions: [.LW, .RW], team: "Chelsea", league: "Premier League"),
+   // Player(name: "Mykhailo Mudryk", ovrRating: 75, positions: [.LW, .RW], team: "Chelsea", league: "Premier League"), LAON
     Player(name: "Jordan Henderson", ovrRating: 81, positions: [.CDM,.CM], team: "Chelsea", league: "Premier League"),
     Player(name: "Valentin Barco", ovrRating: 80, positions: [.CM, .LB], team: "Chelsea", league: "Premier League"),
 
@@ -200,7 +199,7 @@ let _players: [Player] = [
     Player(name: "Ephron Mason-Clark", ovrRating: 74, positions: [.LW,.RW], team: "Coventry", league: "Premier League"),
     Player(name: "Bobby Thomas", ovrRating: 72, positions: [.CB], team: "Coventry", league: "Premier League"),
     Player(name: "Victor Torp", ovrRating: 74, positions: [.CM,.CAM], team: "Coventry", league: "Premier League"),
-    Player(name: "Liam Kitching", ovrRating: 72, positions: [.CB], team: "Coventry", league: "Premier League"),
+   //  Player(name: "Liam Kitching", ovrRating: 72, positions: [.CB], team: "Coventry", league: "Premier League"), loan
     Player(name: "Loum Tchaouna", ovrRating: 74, positions: [.RW,.LW], team: "Coventry", league: "Premier League"),
     Player(name: "Ellis Simms", ovrRating: 73, positions: [.ST], team: "Coventry", league: "Premier League"),
     Player(name: "Aurele Amenda", ovrRating: 72, positions: [.CB], team: "Coventry", league: "Premier League"),
@@ -235,23 +234,23 @@ let _players: [Player] = [
     Player(name: "Daniel Munoz", ovrRating: 78, positions: [.RB], team: "Palace", league: "Premier League"),
     Player(name: "Chadi Riad", ovrRating: 76, positions: [.CB], team: "Palace", league: "Premier League"),
     Player(name: "Oscar Mingueza", ovrRating: 79, positions: [.CB,.RB], team: "Palace", league: "Premier League"),
-    Player(name: "Justin Devenny", ovrRating: 74, positions: [.CM], team: "Palace", league: "Premier League"),
+    // Player(name: "Justin Devenny", ovrRating: 74, positions: [.CM], team: "Palace", league: "Premier League"), LOAN
     Player(name: "Eddie Nketiah", ovrRating: 78, positions: [.ST], team: "Palace", league: "Premier League"),
     Player(name: "Daichi Kamada", ovrRating: 80, positions: [.CAM,.CM], team: "Palace", league: "Premier League"),
     Player(name: "Cheick Doucoure", ovrRating: 81, positions: [.CDM,.CM], team: "Palace", league: "Premier League"),
-    Player(name: "Romain Esse", ovrRating: 74, positions: [.CM,.CAM], team: "Palace", league: "Premier League"),
+    // Player(name: "Romain Esse", ovrRating: 74, positions: [.CM,.CAM], team: "Palace", league: "Premier League"), LAON
     Player(name: "Jefferson Lerma", ovrRating: 80, positions: [.CM,.CDM], team: "Palace", league: "Premier League"),
     Player(name: "Jesurun Rak-Sakyi", ovrRating: 75, positions: [.RW,.LW], team: "Palace", league: "Premier League"),
     Player(name: "Will Hughes", ovrRating: 79, positions: [.CM], team: "Palace", league: "Premier League"),
     Player(name: "Matheus Franca", ovrRating: 77, positions: [.CAM,.CM], team: "Palace", league: "Premier League"),
     Player(name: "Walter Benitez", ovrRating: 78, positions: [.GK], team: "Palace", league: "Premier League"),
-    Player(name: "Borna Sosa", ovrRating: 79, positions: [.LB], team: "Palace", league: "Premier League"),
-    Player(name: "David Ozoh", ovrRating: 73, positions: [.CM,.CDM], team: "Palace", league: "Premier League"),
+    // Player(name: "Borna Sosa", ovrRating: 79, positions: [.LB], team: "Palace", league: "Premier League"), LOAN
+    Player(name: "Ben Chilwell", ovrRating: 76, positions: [.LB], team: "Palace", league: "Premier League"),
+    Player(name: "Quinten Timber", ovrRating: 80, positions: [.CM], team: "Palace", league: "Premier League"),
            
     Player(name: "Axel Disasi", ovrRating: 75, positions: [.CB], team: "Palace", league: "Premier League"), //LOAN
 
     // Everton
-    Player(name: "Iliman Ndiaye", ovrRating: 78, positions: [.ST,.CAM], team: "Everton", league: "Premier League"),
     Player(name: "James Garner", ovrRating: 79, positions: [.CM,.RB], team: "Everton", league: "Premier League"),
     Player(name: "Jarrad Branthwaite", ovrRating: 82, positions: [.CB], team: "Everton", league: "Premier League"),
     Player(name: "Kiernan Dewsbury-Hall", ovrRating: 81, positions: [.CM,.CAM], team: "Everton", league: "Premier League"),
@@ -260,7 +259,7 @@ let _players: [Player] = [
     Player(name: "Vitaliy Mykolenko", ovrRating: 78, positions: [.LB], team: "Everton", league: "Premier League"),
     Player(name: "Tyrique George", ovrRating: 74, positions: [.LW,.RW], team: "Everton", league: "Premier League"),
     Player(name: "Dwight McNeil", ovrRating: 80, positions: [.LM,.LW], team: "Everton", league: "Premier League"),
-    Player(name: "Beto", ovrRating: 78, positions: [.ST], team: "Everton", league: "Premier League"),
+    //Player(name: "Beto", ovrRating: 78, positions: [.ST], team: "Everton", league: "Premier League"),
     Player(name: "Tim Iroegbunam", ovrRating: 75, positions: [.CM,.CDM], team: "Everton", league: "Premier League"),
     Player(name: "Jake O'Brien", ovrRating: 76, positions: [.CB], team: "Everton", league: "Premier League"),
     Player(name: "Tyler Dibling", ovrRating: 74, positions: [.CM,.CAM], team: "Everton", league: "Premier League"),
@@ -273,6 +272,8 @@ let _players: [Player] = [
     Player(name: "James Tarkowski", ovrRating: 80, positions: [.CB], team: "Everton", league: "Premier League"),
     Player(name: "Michael Keane", ovrRating: 78, positions: [.CB], team: "Everton", league: "Premier League"),
     Player(name: "Mark Travers", ovrRating: 76, positions: [.GK], team: "Everton", league: "Premier League"),
+    Player(name: "Ainsley Maitland-Niles", ovrRating: 79, positions: [.RB,.LM], team: "Everton", league: "Premier League"),
+    Player(name: "Jack Grealish", ovrRating: 81, positions: [.LW,.LM], team: "Everton", league: "Premier League"), //loan
 
     // Fulham
     Player(name: "Calvin Bassey", ovrRating: 79, positions: [.CB,.LB], team: "Fulham", league: "Premier League"),
@@ -321,7 +322,11 @@ let _players: [Player] = [
     Player(name: "Semi Ajayi", ovrRating: 76, positions: [.CB], team: "Hull", league: "Premier League"),
     Player(name: "Kieran Dowell", ovrRating: 75, positions: [.CAM,.CM], team: "Hull", league: "Premier League"),
     Player(name: "Mohamed-Ali Cho", ovrRating: 75, positions: [.ST], team: "Hull", league: "Premier League"),
-    Player(name: "Lucas Gourna_Douath", ovrRating: 70, positions: [.CDM], team: "Hull", league: "Premier League"),
+    Player(name: "Lucas Gourna-Douath", ovrRating: 70, positions: [.CDM], team: "Hull", league: "Premier League"),
+    Player(name: "Sorba Thomas", ovrRating: 74, positions: [.LW], team: "Hull", league: "Premier League"),
+    Player(name: "Brooke Norton-Cuffy", ovrRating: 73, positions: [.RB], team: "Hull", league: "Premier League"),
+
+
 
     // Ipswich
     Player(name: "Jack Clarke", ovrRating: 78, positions: [.LW,.RW], team: "Ipswich", league: "Premier League"),
@@ -340,7 +345,7 @@ let _players: [Player] = [
     Player(name: "Issa Diop", ovrRating: 79, positions: [.CB], team: "Ipswich", league: "Premier League"),
     Player(name: "Emerson Royal", ovrRating: 77, positions: [.RB], team: "Ipswich", league: "Premier League"),
    // Player(name: "Ben Johnson", ovrRating: 76, positions: [.RB], team: "Ipswich", league: "Premier League"),
-    Player(name: "Chiedozie Ogbene", ovrRating: 77, positions: [.RW,.RM], team: "Ipswich", league: "Premier League"),
+  //   Player(name: "Chiedozie Ogbene", ovrRating: 77, positions: [.RW,.RM], team: "Ipswich", league: "Premier League"), LOAN
     Player(name: "Chuba Akpom", ovrRating: 77, positions: [.ST,.CAM], team: "Ipswich", league: "Premier League"),
     Player(name: "Sammie Szmodics", ovrRating: 76, positions: [.CAM,.ST], team: "Ipswich", league: "Premier League"),
     Player(name: "Jack Taylor", ovrRating: 75, positions: [.CM], team: "Ipswich", league: "Premier League"),
@@ -395,7 +400,7 @@ let _players: [Player] = [
     Player(name: "Giorgi Mamardashvili", ovrRating: 83, positions: [.GK], team: "Liverpool", league: "Premier League"),
     Player(name: "Conor Bradley", ovrRating: 78, positions: [.RB], team: "Liverpool", league: "Premier League"),
     Player(name: "Giovanni Leoni", ovrRating: 75, positions: [.CB], team: "Liverpool", league: "Premier League"),
-    Player(name: "Harvey Elliott", ovrRating: 80, positions: [.CM,.RW], team: "Liverpool", league: "Premier League"),
+   //  Player(name: "Harvey Elliott", ovrRating: 80, positions: [.CM,.RW], team: "Liverpool", league: "Premier League"), LAON
     Player(name: "Alisson", ovrRating: 89, positions: [.GK], team: "Liverpool", league: "Premier League"),
     Player(name: "Virgil van Dijk", ovrRating: 88, positions: [.CB], team: "Liverpool", league: "Premier League"),
     Player(name: "Joe Gomez", ovrRating: 81, positions: [.CB,.RB,.LB], team: "Liverpool", league: "Premier League"),
@@ -406,6 +411,7 @@ let _players: [Player] = [
     Player(name: "Wataru Endo", ovrRating: 80, positions: [.CDM,.CM], team: "Liverpool", league: "Premier League"),
     Player(name: "Stefan Bajcetic", ovrRating: 77, positions: [.CM,.CDM], team: "Liverpool", league: "Premier League"),
     Player(name: "Freddie Woodman", ovrRating: 76, positions: [.GK], team: "Liverpool", league: "Premier League"),
+    Player(name: "Bradley Barcola", ovrRating: 84, positions: [.LW], team: "Liverpool", league: "Premier League"),
 
     // Man City
     Player(name: "Erling Haaland", ovrRating: 94, positions: [.ST], team: "Man City", league: "Premier League"),
@@ -418,7 +424,8 @@ let _players: [Player] = [
     Player(name: "Josko Gvardiol", ovrRating: 85, positions: [.LB,.CB], team: "Man City", league: "Premier League"),
     Player(name: "Nico O'Reilly", ovrRating: 79, positions: [.LB, .CM], team: "Man City", league: "Premier League"),
     Player(name: "Ruben Dias", ovrRating: 86, positions: [.CB], team: "Man City", league: "Premier League"),
-    
+    Player(name: "Enzo Fernandez", ovrRating: 85, positions: [.CM,.CAM], team: "Man City", league: "Premier League"),
+    Player(name: "Iliman Ndiaye", ovrRating: 82, positions: [.RW], team: "Man City", league: "Premier League"),
     Player(name: "Ayyoub Bouaddi", ovrRating: 80, positions: [.CM], team: "Man City", league: "Other Leagues"),
  //   Player(name: "Tijjani Reijnders", ovrRating: 82, positions: [.CM,.CAM], team: "Man City", league: "Premier League"),
     Player(name: "Matheus Nunes", ovrRating: 81, positions: [.CM,.LW], team: "Man City", league: "Premier League"),
@@ -429,9 +436,9 @@ let _players: [Player] = [
     Player(name: "Vitor Reis", ovrRating: 75, positions: [.CB], team: "Man City", league: "Premier League"),
     Player(name: "Rico Lewis", ovrRating: 79, positions: [.RB,.CM], team: "Man City", league: "Premier League"),
     Player(name: "James Trafford", ovrRating: 77, positions: [.GK], team: "Man City", league: "Premier League"),
-    Player(name: "Jack Grealish", ovrRating: 81, positions: [.LW,.LM], team: "Man City", league: "Premier League"),
+    // Player(name: "Jack Grealish", ovrRating: 81, positions: [.LW,.LM], team: "Man City", league: "Premier League"), LAON
     Player(name: "Claudio Echeverri", ovrRating: 76, positions: [.CAM], team: "Man City", league: "Premier League"),
-    Player(name: "Jeremy Monga", ovrRating: 74, positions: [.LW,.RW], team: "Man City", league: "Premier League"),
+    // Player(name: "Jeremy Monga", ovrRating: 74, positions: [.LW,.RW], team: "Man City", league: "Premier League"), LAONde
     Player(name: "Mateo Kovacic", ovrRating: 82, positions: [.CM], team: "Man City", league: "Premier League"),
     Player(name: "Marcus Bettinelli", ovrRating: 75, positions: [.GK], team: "Man City", league: "Premier League"),
     Player(name: "Kalvin Phillips", ovrRating: 76, positions: [.CDM,.CM], team: "Man City", league: "Premier League"),
@@ -461,12 +468,12 @@ let _players: [Player] = [
     Player(name: "Luke Shaw", ovrRating: 78, positions: [.LB,.CB], team: "Man United", league: "Premier League"),
     Player(name: "Harry Amass", ovrRating: 73, positions: [.LB], team: "Man United", league: "Premier League"),
     Player(name: "Altay Bayindir", ovrRating: 77, positions: [.GK], team: "Man United", league: "Premier League"),
-    Player(name: "Chido Obi", ovrRating: 73, positions: [.ST], team: "Man United", league: "Premier League"),
+    // Player(name: "Chido Obi", ovrRating: 73, positions: [.ST], team: "Man United", league: "Premier League"), LOAN
     Player(name: "Carlos Baleba", ovrRating: 81, positions: [.CDM,.CM], team: "Man United", league: "Premier League"),
 
     // Newcastle
     Player(name: "Bruno Guimaraes", ovrRating: 87, positions: [.CM,.CDM], team: "Newcastle", league: "Premier League"),
-    Player(name: "Nick Woltemade", ovrRating: 77, positions: [.ST], team: "Newcastle", league: "Premier League"),
+    //Player(name: "Nick Woltemade", ovrRating: 77, positions: [.ST], team: "Newcastle", league: "Premier League"), LOAN
     Player(name: "Bazoumana Toure", ovrRating: 78, positions: [.LW,.RW], team: "Newcastle", league: "Premier League"),
     Player(name: "Tino Livramento", ovrRating: 80, positions: [.RB], team: "Newcastle", league: "Premier League"),
     Player(name: "Malick Thiaw", ovrRating: 81, positions: [.CB], team: "Newcastle", league: "Premier League"),
@@ -491,6 +498,7 @@ let _players: [Player] = [
     Player(name: "Aidan Harris", ovrRating: 72, positions: [.ST], team: "Newcastle", league: "Premier League"),
     Player(name: "Nico Gonzalez", ovrRating: 80, positions: [.CDM], team: "Newcastle", league: "Premier League"),
     Player(name: "Amar Dedic", ovrRating: 78, positions: [.RB], team: "Newcastle", league: "Premier League"),
+    Player(name: "Matias Fernandez-Pardo", ovrRating: 75, positions: [.ST], team: "Newcastle", league: "Premier League"),
 
     // Forest
     Player(name: "Morgan Gibbs-White", ovrRating: 82, positions: [.CAM,.CM], team: "Forest", league: "Premier League"),
@@ -508,7 +516,7 @@ let _players: [Player] = [
     Player(name: "Nicolas Dominguez", ovrRating: 79, positions: [.CM,.CDM], team: "Forest", league: "Premier League"),
     Player(name: "Nicolo Savona", ovrRating: 74, positions: [.RB], team: "Forest", league: "Premier League"),
     Player(name: "Jair Cunya", ovrRating: 75, positions: [.CB], team: "Forest", league: "Premier League"),
-    Player(name: "Morato", ovrRating: 78, positions: [.CB], team: "Forest", league: "Premier League"),
+    // Player(name: "Morato", ovrRating: 78, positions: [.CB], team: "Forest", league: "Premier League"), LOAN
     Player(name: "Xaver Schlager", ovrRating: 80, positions: [.CDM,.CM], team: "Forest", league: "Premier League"),
     //Player(name: "Taiwo Awoniyi", ovrRating: 77, positions: [.ST], team: "Forest", league: "Premier League"),
     Player(name: "Luca Tez", ovrRating: 74, positions: [.CM], team: "Forest", league: "Premier League"),
@@ -528,7 +536,7 @@ let _players: [Player] = [
     Player(name: "Chemsdine Talbi", ovrRating: 75, positions: [.LW,.RW], team: "Sunderland", league: "Premier League"),
     Player(name: "Chris Rigg", ovrRating: 75, positions: [.CM,.CAM], team: "Sunderland", league: "Premier League"),
     Player(name: "Trai Hume", ovrRating: 77, positions: [.RB,.CB], team: "Sunderland", league: "Premier League"),
-    Player(name: "Simon Adingra", ovrRating: 79, positions: [.RW,.LW], team: "Sunderland", league: "Premier League"),
+    // Player(name: "Simon Adingra", ovrRating: 79, positions: [.RW,.LW], team: "Sunderland", league: "Premier League"), LOAN
     Player(name: "Dan Ballard", ovrRating: 77, positions: [.CB], team: "Sunderland", league: "Premier League"),
     Player(name: "Wilson Isidor", ovrRating: 75, positions: [.ST], team: "Sunderland", league: "Premier League"),
     Player(name: "Nilson Angulo", ovrRating: 74, positions: [.LW,.RW], team: "Sunderland", league: "Premier League"),
@@ -543,6 +551,8 @@ let _players: [Player] = [
     Player(name: "Jocelin Ta Bi", ovrRating: 73, positions: [.CB], team: "Sunderland", league: "Premier League"),
     Player(name: "Thomas Munier", ovrRating: 78, positions: [.RB], team: "Sunderland", league: "Premier League"),
     Player(name: "Luke O'Nien", ovrRating: 77, positions: [.CB,.CDM], team: "Sunderland", league: "Premier League"),
+    Player(name: "Malick Fofana", ovrRating: 78, positions: [.LW], team: "Sunderland", league: "Premier League"),
+    Player(name: "Kevin Danso", ovrRating: 80, positions: [.CB], team: "Sunderland", league: "Premier League"), //in
 
     // Spurs
     Player(name: "Sandro Tonali", ovrRating: 85, positions: [.CM,.CDM], team: "Spurs", league: "Premier League"),
@@ -561,7 +571,7 @@ let _players: [Player] = [
     Player(name: "Richarlison", ovrRating: 78, positions: [.ST,.LW], team: "Spurs", league: "Premier League"),
     Player(name: "Marcos Senesi", ovrRating: 79, positions: [.CB], team: "Spurs", league: "Premier League"),
     Player(name: "Mathys Tel", ovrRating: 77, positions: [.ST,.LW], team: "Spurs", league: "Premier League"),
-    Player(name: "Kevin Danso", ovrRating: 80, positions: [.CB], team: "Spurs", league: "Premier League"),
+   //  Player(name: "Kevin Danso", ovrRating: 80, positions: [.CB], team: "Spurs", league: "Premier League"), LAON
     Player(name: "James Maddison", ovrRating: 84, positions: [.CAM,.CM], team: "Spurs", league: "Premier League"),
     Player(name: "Rodrigo Bentancur", ovrRating: 80, positions: [.CM,.CDM], team: "Spurs", league: "Premier League"),
     // Player(name: "Guglielmo Vicario", ovrRating: 81, positions: [.GK], team: "Spurs", league: "Premier League"), LOAN
@@ -576,6 +586,8 @@ let _players: [Player] = [
     Player(name: "Kota Takai", ovrRating: 73, positions: [.CB], team: "Spurs", league: "Premier League"),
     Player(name: "Ben Davies", ovrRating: 79, positions: [.CB,.LB], team: "Spurs", league: "Premier League"),
     Player(name: "Omar Marmoush", ovrRating: 80, positions: [.ST,.LW], team: "Spurs", league: "Premier League"),
+    Player(name: "Tosin Adarabioyo", ovrRating: 77, positions: [.CB], team: "Spurs", league: "Premier League"),
+    Player(name: "Mykhailo Mudryk", ovrRating: 75, positions: [.LW, .RW], team: "Spurs", league: "Premier League"),
 
     // MARK: - Other Leagues
 
@@ -605,7 +617,7 @@ let _players: [Player] = [
     Player(name: "Obed Vargas", ovrRating: 78, positions: [.CM], team: "Atletico", league: "Other Leagues"),
     Player(name: "Rodrigo Mendoza", ovrRating: 77, positions: [.ST], team: "Atletico", league: "Other Leagues"),
     Player(name: "Cristian Romero", ovrRating: 83, positions: [.CB], team: "Atletico", league: "Other Leagues"),
-
+    Player(name: "Jonathan David", ovrRating: 81, positions: [.ST], team: "Atletico", league: "Other Leagues"), // in
     // Real Madrid
     Player(name: "Kylian Mbappe", ovrRating: 93, positions: [.ST,.LW], team: "Real Madrid", league: "Other Leagues"),
     Player(name: "Jude Bellingham", ovrRating: 91, positions: [.CAM], team: "Real Madrid", league: "Other Leagues"),
@@ -654,7 +666,7 @@ let _players: [Player] = [
     Player(name: "Karim Adeyemi", ovrRating: 80, positions: [.LW], team: "Barcelona", league: "Other Leagues"),
     Player(name: "Eric Garcia", ovrRating: 82, positions: [.CB], team: "Barcelona", league: "Other Leagues"),
     Player(name: "Joan Garcia", ovrRating: 84, positions: [.GK], team: "Barcelona", league: "Other Leagues"),
-    Player(name: "Marc Casado", ovrRating: 79, positions: [.CM], team: "Barcelona", league: "Other Leagues"),
+   //  Player(name: "Marc Casado", ovrRating: 79, positions: [.CM], team: "Barcelona", league: "Other Leagues"), LOAN
     Player(name: "Marc Bernal", ovrRating: 77, positions: [.CDM], team: "Barcelona", league: "Other Leagues"),
     Player(name: "Rooney Bardghji", ovrRating: 76, positions: [.RW], team: "Barcelona", league: "Other Leagues"),
     Player(name: "Hector Fort", ovrRating: 76, positions: [.RB], team: "Barcelona", league: "Other Leagues"),
@@ -735,7 +747,7 @@ let _players: [Player] = [
     Player(name: "Bryan Zaragoza", ovrRating: 78, positions: [.LW], team: "Bayern", league: "Other Leagues"),
     Player(name: "Arijon Ibrahimovic", ovrRating: 77, positions: [.CAM], team: "Bayern", league: "Other Leagues"),
     Player(name: "Nathaniel Brown", ovrRating: 80, positions: [.CB], team: "Bayern", league: "Other Leagues"),
-    Player(name: "Lennart Karl", ovrRating: 75, positions: [.GK], team: "Bayern", league: "Other Leagues"),
+    Player(name: "Lennart Karl", ovrRating: 75, positions: [.LW], team: "Bayern", league: "Other Leagues"),
     Player(name: "Jonas Urbig", ovrRating: 75, positions: [.GK], team: "Bayern", league: "Other Leagues"),
 
     // Dortmund
@@ -761,6 +773,7 @@ let _players: [Player] = [
     Player(name: "Luca Reggiani", ovrRating: 73, positions: [.GK], team: "Dortmund", league: "Other Leagues"),
     Player(name: "Joey Veerman", ovrRating: 81, positions: [.CM], team: "Dortmund", league: "Other Leagues"),
     Player(name: "Giannis Konstantelias", ovrRating: 79, positions: [.CAM], team: "Dortmund", league: "Other Leagues"),
+    Player(name: "Ethan Nwaneri", ovrRating: 75, positions: [.CAM,.CM], team: "Dortmund", league: "Other Leagues"), //in
 
     // RB Leipzig
     Player(name: "Castello Lukeba", ovrRating: 83, positions: [.CB], team: "RB Leipzig", league: "Other Leagues"),
@@ -781,13 +794,13 @@ let _players: [Player] = [
     Player(name: "Assan Ouedraogo", ovrRating: 77, positions: [.CM], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Brajan Gruda", ovrRating: 77, positions: [.RW], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Romulo", ovrRating: 77, positions: [.CM], team: "RB Leipzig", league: "Other Leagues"),
-    Player(name: "El Chadaille Bitshiabu", ovrRating: 76, positions: [.CB], team: "RB Leipzig", league: "Other Leagues"),
+    // Player(name: "El Chadaille Bitshiabu", ovrRating: 76, positions: [.CB], team: "RB Leipzig", league: "Other Leagues"), LOAN
     Player(name: "Ezechiel Banzuzi", ovrRating: 76, positions: [.CM], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Andrija Maksimovic", ovrRating: 75, positions: [.CAM], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Conrad Harder", ovrRating: 75, positions: [.CB], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Abdoul Kone", ovrRating: 74, positions: [.LB], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Maarten Vandevoordt", ovrRating: 79, positions: [.GK], team: "RB Leipzig", league: "Other Leagues"),
-           
+    Player(name: "Marc Guiu", ovrRating: 74, positions: [.ST], team: "RB Leipzig", league: "Other Leagues"),
     Player(name: "Christopher Nkunku", ovrRating: 80, positions: [.CAM,.ST], team: "RB Leipzig", league: "Other Leagues"),
 
     // Leverkusen
@@ -808,7 +821,7 @@ let _players: [Player] = [
     Player(name: "Nathan Tella", ovrRating: 79, positions: [.RW], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Ibrahim Maza", ovrRating: 79, positions: [.CM], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Jeanuel Belocian", ovrRating: 77, positions: [.CB], team: "Leverkusen", league: "Other Leagues"),
-    //Player(name: "Ernest Poku", ovrRating: 77, positions: [.RW], team: "Leverkusen", league: "Other Leagues"),
+    Player(name: "Guela Doue", ovrRating: 77, positions: [.RB], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Axel Tape", ovrRating: 76, positions: [.CB, .CDM], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Afonso Moreira", ovrRating: 76, positions: [.LW], team: "Leverkusen", league: "Other Leagues"),
     Player(name: "Kerim Alajbegovic", ovrRating: 75, positions: [.CAM], team: "Leverkusen", league: "Other Leagues"),
@@ -826,7 +839,6 @@ let _players: [Player] = [
     Player(name: "Lucas Hernandez", ovrRating: 82, positions: [.CB,.LB], team: "PSG", league: "Other Leagues"),
     Player(name: "Joao Neves", ovrRating: 85, positions: [.CM], team: "PSG", league: "Other Leagues"),
     Player(name: "Nuno Mendes", ovrRating: 86, positions: [.LB], team: "PSG", league: "Other Leagues"),
-    Player(name: "Bradley Barcola", ovrRating: 84, positions: [.LW], team: "PSG", league: "Other Leagues"),
     Player(name: "Willian Pacho", ovrRating: 87, positions: [.CB], team: "PSG", league: "Other Leagues"),
     Player(name: "Ilya Zabarnyi", ovrRating: 82, positions: [.CB], team: "PSG", league: "Other Leagues"),
     Player(name: "Fabian Ruiz", ovrRating: 84, positions: [.CM], team: "PSG", league: "Other Leagues"),
@@ -846,9 +858,8 @@ let _players: [Player] = [
     Player(name: "Nicolas Tagliafico", ovrRating: 82, positions: [.LB], team: "Lyon", league: "Other Leagues"),
     Player(name: "Ruben Kluivert", ovrRating: 81, positions: [.LW], team: "Lyon", league: "Other Leagues"),
     Player(name: "Orel Mangala", ovrRating: 81, positions: [.CM], team: "Lyon", league: "Other Leagues"),
-    Player(name: "Ainsley Maitland-Niles", ovrRating: 79, positions: [.RB,.LM], team: "Lyon", league: "Other Leagues"),
+    //Player(name: "Ainsley Maitland-Niles", ovrRating: 79, positions: [.RB,.LM], team: "Lyon", league: "Other Leagues"),
     Player(name: "Moussa Niakhate", ovrRating: 79, positions: [.CB], team: "Lyon", league: "Other Leagues"),
-    Player(name: "Malick Fofana", ovrRating: 78, positions: [.LW], team: "Lyon", league: "Other Leagues"),
     Player(name: "Tanner Tessman", ovrRating: 78, positions: [.CM], team: "Lyon", league: "Other Leagues"),
     Player(name: "Ernest Nuamah", ovrRating: 77, positions: [.LW], team: "Lyon", league: "Other Leagues"),
     Player(name: "Pavel Sulc", ovrRating: 77, positions: [.CM], team: "Lyon", league: "Other Leagues"),
@@ -866,11 +877,12 @@ let _players: [Player] = [
     Player(name: "Kail Boudache", ovrRating: 73, positions: [.CM], team: "Lyon", league: "Other Leagues"),
     Player(name: "Athys De Carvalho", ovrRating: 72, positions: [.GK], team: "Lyon", league: "Other Leagues"),
     Player(name: "Remy Descamps", ovrRating: 76, positions: [.GK], team: "Lyon", league: "Other Leagues"),
+    Player(name: "Keito Nakamura", ovrRating: 76, positions: [.LW], team: "Lyon", league: "Other Leagues"),
 
     // Monaco
     Player(name: "Denis Zakaria", ovrRating: 82, positions: [.CDM], team: "Monaco", league: "Other Leagues"),
     Player(name: "Aleksandr Golovin", ovrRating: 80, positions: [.CAM], team: "Monaco", league: "Other Leagues"),
-    Player(name: "Thilo Kehrer", ovrRating: 81, positions: [.CB], team: "Monaco", league: "Other Leagues"),
+   // Player(name: "Thilo Kehrer", ovrRating: 81, positions: [.CB], team: "Monaco", league: "Other Leagues"), LOAN
     Player(name: "Folarin Balogun", ovrRating: 80, positions: [.ST], team: "Monaco", league: "Other Leagues"),
     Player(name: "Takumi Minamino", ovrRating: 78, positions: [.CAM], team: "Monaco", league: "Other Leagues"),
     Player(name: "Maghnes Akliouche", ovrRating: 80, positions: [.CAM], team: "Monaco", league: "Other Leagues"),
@@ -896,7 +908,6 @@ let _players: [Player] = [
     Player(name: "Leonardo Balerdi", ovrRating: 82, positions: [.CB], team: "Marseille", league: "Other Leagues"),
     Player(name: "Nayef Aguerd", ovrRating: 82, positions: [.CB], team: "Marseille", league: "Other Leagues"),
     Player(name: "Geronimo Rulli", ovrRating: 82, positions: [.GK], team: "Marseille", league: "Other Leagues"),
-    Player(name: "Quinten Timber", ovrRating: 80, positions: [.CM], team: "Marseille", league: "Other Leagues"),
     Player(name: "Angel Gomes", ovrRating: 79, positions: [.CM], team: "Marseille", league: "Other Leagues"),
     Player(name: "Timothy Weah", ovrRating: 79, positions: [.RW,.LW], team: "Marseille", league: "Other Leagues"),
     Player(name: "Facundo Medina", ovrRating: 79, positions: [.CB], team: "Marseille", league: "Other Leagues"),
@@ -920,13 +931,12 @@ let _players: [Player] = [
     Player(name: "Gaetan Perrin", ovrRating: 77, positions: [.RW], team: "Lille", league: "Other Leagues"),
     Player(name: "Osame Sahraoui", ovrRating: 76, positions: [.LW], team: "Lille", league: "Other Leagues"),
     Player(name: "Tiago Santos", ovrRating: 76, positions: [.RB], team: "Lille", league: "Other Leagues"),
-    Player(name: "Matias Fernandez-Pardo", ovrRating: 75, positions: [.LW], team: "Lille", league: "Other Leagues"),
     Player(name: "Nathan Ngoy", ovrRating: 75, positions: [.CB], team: "Lille", league: "Other Leagues"),
     Player(name: "Romain Perraud", ovrRating: 75, positions: [.LB], team: "Lille", league: "Other Leagues"),
     Player(name: "Berke Ozer", ovrRating: 75, positions: [.GK], team: "Lille", league: "Other Leagues"),
     Player(name: "Basar Onal", ovrRating: 74, positions: [.ST], team: "Lille", league: "Other Leagues"),
     Player(name: "Ethan Mbappe", ovrRating: 74, positions: [.LW], team: "Lille", league: "Other Leagues"),
-    Player(name: "Felix Correia", ovrRating: 74, positions: [.ST], team: "Lille", league: "Other Leagues"),
+    //Player(name: "Felix Correia", ovrRating: 74, positions: [.ST], team: "Lille", league: "Other Leagues"),
     Player(name: "Marius Broholm", ovrRating: 74, positions: [.CM], team: "Lille", league: "Other Leagues"),
     Player(name: "Noah Edjouma", ovrRating: 73, positions: [.RW], team: "Lille", league: "Other Leagues"),
     Player(name: "Djoumo Srdanovic", ovrRating: 72, positions: [.GK], team: "Lille", league: "Other Leagues"),
@@ -1038,7 +1048,7 @@ let _players: [Player] = [
     Player(name: "Teun Koopmeiners", ovrRating: 83, positions: [.CM], team: "Juventus", league: "Other Leagues"),
     Player(name: "Douglas Luiz", ovrRating: 81, positions: [.CM], team: "Juventus", league: "Other Leagues"),
     Player(name: "Kenan Yildiz", ovrRating: 85, positions: [.LW], team: "Juventus", league: "Other Leagues"),
-    Player(name: "Jonathan David", ovrRating: 82, positions: [.ST], team: "Juventus", league: "Other Leagues"),
+   // Player(name: "Jonathan David", ovrRating: 82, positions: [.ST], team: "Juventus", league: "Other Leagues"), LOAN
     Player(name: "Lois Openda", ovrRating: 81, positions: [.ST], team: "Juventus", league: "Other Leagues"),
     Player(name: "Pierre Kalulu", ovrRating: 82, positions: [.CB], team: "Juventus", league: "Other Leagues"),
     Player(name: "Manuel Locatelli", ovrRating: 83, positions: [.CDM], team: "Juventus", league: "Other Leagues"),
@@ -1048,7 +1058,7 @@ let _players: [Player] = [
     Player(name: "Khephren Thuram", ovrRating: 82, positions: [.CM], team: "Juventus", league: "Other Leagues"),
     Player(name: "Nicolas Gonzalez", ovrRating: 81, positions: [.RW], team: "Juventus", league: "Other Leagues"),
     Player(name: "Francisco Conceicao", ovrRating: 81, positions: [.RW], team: "Juventus", league: "Other Leagues"),
-
+    Player(name: "Nick Woltemade", ovrRating: 77, positions: [.ST], team: "Juventus", league: "Other Leagues"), // in
     Player(name: "Lloyd Kelly", ovrRating: 79, positions: [.CB], team: "Juventus", league: "Other Leagues"),
     Player(name: "Edon Zhegrova", ovrRating: 79, positions: [.RW], team: "Juventus", league: "Other Leagues"),
     //Player(name: "Fabio Miretti", ovrRating: 78, positions: [.CM], team: "Juventus", league: "Other Leagues"), LOAN
@@ -1106,7 +1116,7 @@ let _players: [Player] = [
     Player(name: "Alex Valle", ovrRating: 75, positions: [.RB], team: "Como", league: "Other Leagues"),
     Player(name: "Ignace Van Der Brempt", ovrRating: 75, positions: [.RB], team: "Como", league: "Other Leagues"),
     Player(name: "Jesus Rodriguez", ovrRating: 75, positions: [.LB], team: "Como", league: "Other Leagues"),
-    Player(name: "Nicolas Kuhn", ovrRating: 75, positions: [.LW], team: "Como", league: "Other Leagues"),
+    //Player(name: "Nicolas Kuhn", ovrRating: 75, positions: [.LW], team: "Como", league: "Other Leagues"), lAON
     Player(name: "Adrian Lahdo", ovrRating: 74, positions: [.RW], team: "Como", league: "Other Leagues"),
     Player(name: "Mattia Liberali", ovrRating: 74, positions: [.CM], team: "Como", league: "Other Leagues"),
     Player(name: "Jayden Addai", ovrRating: 73, positions: [.LB], team: "Como", league: "Other Leagues"),
@@ -1118,6 +1128,8 @@ let _players: [Player] = [
     Player(name: "Nel Tornqvist", ovrRating: 73, positions: [.CM], team: "Como", league: "Other Leagues"),
     Player(name: "Trevoh Chalobah", ovrRating: 78, positions: [.CB], team: "Como", league: "Other Leagues"),
     Player(name: "Willy Kambwala", ovrRating: 76, positions: [.CB], team: "Como", league: "Other Leagues"),
+    Player(name: "Robert Sanchez", ovrRating: 82, positions: [.GK], team: "Como", league: "Other Leagues"), // loan
+    Player(name: "Moise Kean", ovrRating: 77, positions: [.LW], team: "Como", league: "Other Leagues"), // in
 
     // Ajax
     Player(name: "Daley Blind", ovrRating: 80, positions: [.CB,.LB], team: "Ajax", league: "Other Leagues"),
@@ -1126,6 +1138,9 @@ let _players: [Player] = [
     //Player(name: "Josip Sutalo", ovrRating: 80, positions: [.CB], team: "Ajax", league: "Other Leagues"),
     Player(name: "Oscar Gloukh", ovrRating: 80, positions: [.CAM], team: "Ajax", league: "Other Leagues"),
    // Player(name: "Ko Itakura", ovrRating: 80, positions: [.CB], team: "Ajax", league: "Other Leagues"),
+    
+    Player(name: "Thilo Kehrer", ovrRating: 80, positions: [.CB], team: "Ajax", league: "Other Leagues"), // laoinin
+    Player(name: "Simon Adingra", ovrRating: 79, positions: [.RW,.LW], team: "Ajax", league: "Other Leagues"), // loan in
    
     Player(name: "Kian Fitz-Jim", ovrRating: 78, positions: [.CAM], team: "Ajax", league: "Other Leagues"),
     Player(name: "Kasper Dolberg", ovrRating: 78, positions: [.ST], team: "Ajax", league: "Other Leagues"),
@@ -1161,7 +1176,7 @@ let _players: [Player] = [
     Player(name: "Dodi Lukebakio", ovrRating: 81, positions: [.RW], team: "Benfica", league: "Other Leagues"),
     Player(name: "Leandro Barreiro", ovrRating: 80, positions: [.CM], team: "Benfica", league: "Other Leagues"),
     Player(name: "Andreas Schjelderup", ovrRating: 79, positions: [.LW], team: "Benfica", league: "Other Leagues"),
-    Player(name: "Richard Rios", ovrRating: 79, positions: [.CM], team: "Benfica", league: "Other Leagues"),
+    //Player(name: "Richard Rios", ovrRating: 79, positions: [.CM], team: "Benfica", league: "Other Leagues"),
     Player(name: "Enzo Barrenechea", ovrRating: 78, positions: [.CM], team: "Benfica", league: "Other Leagues"),
     Player(name: "Jakub Kaminski", ovrRating: 78, positions: [.LW], team: "Benfica", league: "Other Leagues"),
     Player(name: "Gianluca Prestianni", ovrRating: 77, positions: [.RW], team: "Benfica", league: "Other Leagues"),
@@ -1249,10 +1264,11 @@ let _players: [Player] = [
     Player(name: "Tjark Ernst", ovrRating: 73, positions: [.GK], team: "Feyenoord", league: "Other Leagues"),
     Player(name: "Gjival Zechiel", ovrRating: 72, positions: [.GK], team: "Feyenoord", league: "Other Leagues"),
     Player(name: "Jakub Ostrzyk", ovrRating: 72, positions: [.GK], team: "Feyenoord", league: "Other Leagues"),
+    Player(name: "Reiss Nelson", ovrRating: 74, positions: [.RW,.LW], team: "Fayenoord", league: "Other Leagues"),
 
     // PSV
     Player(name: "Ivan Perisic", ovrRating: 80, positions: [.LW], team: "PSV", league: "Other Leagues"),
-    
+    Player(name: "Ayoni Santos", ovrRating: 70, positions: [.CAM], team: "PSV", league: "Other Leagues"),
     Player(name: "Jerdy Schouten", ovrRating: 81, positions: [.CDM], team: "PSV", league: "Other Leagues"),
     Player(name: "Ricardo Pepi", ovrRating: 80, positions: [.ST], team: "PSV", league: "Other Leagues"),
     Player(name: "Sergino Dest", ovrRating: 79, positions: [.RB,.LB], team: "PSV", league: "Other Leagues"),
@@ -1267,7 +1283,7 @@ let _players: [Player] = [
     Player(name: "Mauro Junior", ovrRating: 76, positions: [.LB], team: "PSV", league: "Other Leagues"),
     Player(name: "Yarek Gasiorowski", ovrRating: 75, positions: [.CB], team: "PSV", league: "Other Leagues"),
     Player(name: "Nick Olij", ovrRating: 75, positions: [.GK], team: "PSV", league: "Other Leagues"),
-   // Player(name: "Couhaib Driouech", ovrRating: 74, positions: [.RW], team: "PSV", league: "Other Leagues"),
+    Player(name: "Sam Lammers", ovrRating: 71, positions: [.ST], team: "PSV", league: "Other Leagues"),
     Player(name: "Esmir Bajraktarevic", ovrRating: 74, positions: [.LW], team: "PSV", league: "Other Leagues"),
     Player(name: "Ruben Van Bommel", ovrRating: 74, positions: [.GK], team: "PSV", league: "Other Leagues"),
     Player(name: "Noah Fernandez", ovrRating: 72, positions: [.GK], team: "PSV", league: "Other Leagues"),
@@ -1329,17 +1345,15 @@ let _players: [Player] = [
     Player(name: "Joel Ordonez", ovrRating: 77, positions: [.CB], team: "Global Superstars", league: "Global Superstars"),
     Player(name: "Can Uzun", ovrRating: 76, positions: [.CAM,.ST], team: "Global Superstars", league: "Global Superstars"),
     //Player(name: "Valentin Barco", ovrRating: 76, positions: [.LB,.LM], team: "Global Superstars", league: "Global Superstars"),
-    Player(name: "Diego Luna", ovrRating: 76, positions: [.CAM,.LW], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Diego Moreira", ovrRating: 75, positions: [.LW], team: "Global Superstars", league: "Global Superstars"),
     //Player(name: "Fisnik Asllani", ovrRating: 75, positions: [.ST], team: "Global Superstars", league: "Global Superstars"),
     //Player(name: "Mamadou Sangare", ovrRating: 75, positions: [.ST], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Said El Mala", ovrRating: 74, positions: [.LW,.RW], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Esteban Lepaul", ovrRating: 74, positions: [.ST], team: "Global Superstars", league: "Global Superstars"),
   ///  Player(name: "Konstantinos Karetsas", ovrRating: 74, positions: [.CAM], team: "Global Superstars", league: "Global Superstars"),
-    Player(name: "Sebastian Berhalter", ovrRating: 76, positions: [.CM], team: "Global Superstars", league: "Global Superstars"),
+    Player(name: "Sebastian Berhalter", ovrRating: 77, positions: [.CM], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Joaquin Panichelli", ovrRating: 73, positions: [.ST], team: "Global Superstars", league: "Global Superstars"),
    // Player(name: "Finn Jeltsch", ovrRating: 72, positions: [.CB], team: "Global Superstars", league: "Global Superstars"),
-    Player(name: "Julien Hall", ovrRating: 72, positions: [.ST, .LW, .RW], team: "Global Superstars", league: "Global Superstars"),
 
     // MARK: - Newly Added (global superstars)
 
@@ -1467,7 +1481,7 @@ let _players: [Player] = [
     Player(name: "Thibaut Courtois", ovrRating: 94, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Alisson Becker", ovrRating: 93, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Emiliano Martinez", ovrRating: 91, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Marc-André ter Stegen", ovrRating: 91, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Marc-André ter Stegen", ovrRating: 91, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Gianluigi Donnarumma", ovrRating: 91, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Ederson", ovrRating: 90, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Diogo Costa", ovrRating: 91, positions: [.GK], team: "Upgraded Players", league: "Upgraded Players"),
@@ -1484,14 +1498,14 @@ let _players: [Player] = [
     Player(name: "João Cancelo", ovrRating: 89, positions: [.LB,.RB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Rúben Dias", ovrRating: 89, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Antonio Rüdiger", ovrRating: 89, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Ronald Araújo", ovrRating: 88, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Ronald Araújo", ovrRating: 88, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Josko Gvardiol", ovrRating: 91, positions: [.CB,.LB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Marquinhos", ovrRating: 90, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Éder Militão", ovrRating: 89, positions: [.CB,.RB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Jules Koundé", ovrRating: 89, positions: [.CB,.RB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Reece James", ovrRating: 92, positions: [.RB,.RWB], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Nuno Mendes", ovrRating: 89, positions: [.LB], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Gabriel Magalhães", ovrRating: 95, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
+    Player(name: "Gabriel", ovrRating: 95, positions: [.CB], team: "Upgraded Players", league: "Upgraded Players"),
 
     // Midfielders
     Player(name: "Kevin De Bruyne", ovrRating: 94, positions: [.CAM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
@@ -1504,7 +1518,7 @@ let _players: [Player] = [
     Player(name: "Florian Wirtz", ovrRating: 91, positions: [.CAM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Bruno Fernandes", ovrRating: 95, positions: [.CAM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Martin Ødegaard", ovrRating: 90, positions: [.CAM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Phil Foden", ovrRating: 90, positions: [.CAM,.LW], team: "Upgraded Players", league: "Upgraded Players"),
+   // Player(name: "Phil Foden", ovrRating: 90, positions: [.CAM,.LW], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Bernardo Silva", ovrRating: 89, positions: [.RW,.CM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Moisés Caicedo", ovrRating: 95, positions: [.CDM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Luka Modrić", ovrRating: 89, positions: [.CM,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
@@ -1513,7 +1527,7 @@ let _players: [Player] = [
     Player(name: "Frenkie de Jong", ovrRating: 89, positions: [.CM,.CDM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Nicolò Barella", ovrRating: 89, positions: [.CM,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Dani Olmo", ovrRating: 89, positions: [.CAM,.LW], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Hakan Çalhanoğlu", ovrRating: 88, positions: [.CM,.CDM], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Hakan Çalhanoğlu", ovrRating: 88, positions: [.CM,.CDM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Bruno Guimarães", ovrRating: 88, positions: [.CDM,.CM], team: "Upgraded Players", league: "Upgraded Players"),
    // Player(name: "Cole Palmer", ovrRating: 95, positions: [.CAM,.LM, .LW], team: "Upgraded Players", league: "Upgraded Players"),
     
@@ -1525,14 +1539,14 @@ let _players: [Player] = [
     Player(name: "Mohamed Salah", ovrRating: 93, positions: [.RW,.RM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Harry Kane", ovrRating: 98, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Bukayo Saka", ovrRating: 92, positions: [.RW,.RM], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Lautaro Martínez", ovrRating: 91, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Lautaro Martínez", ovrRating: 91, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Cole Palmer", ovrRating: 94, positions: [.CAM,.RW], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Son Heung-min", ovrRating: 93, positions: [.LW,.ST], team: "Upgraded Players", league: "Upgraded Players"),
+    Player(name: "Son Heung-min", ovrRating: 90, positions: [.LW,.ST], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Ousmane Dembélé", ovrRating: 94, positions: [.RW,.LW], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Yan Diomande", ovrRating: 89, positions: [.LW,.RW], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Yan Diomande", ovrRating: 89, positions: [.LW,.RW], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Alexander Isak", ovrRating: 92, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Viktor Gyökeres", ovrRating: 91, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Gavi", ovrRating: 90, positions: [.CM,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
+    //Player(name: "Viktor Gyökeres", ovrRating: 91, positions: [.ST], team: "Upgraded Players", league: "Upgraded Players"),
+   // Player(name: "Gavi", ovrRating: 90, positions: [.CM,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Lamine Yamal", ovrRating: 94, positions: [.RW,.LW], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Raphinha", ovrRating: 93, positions: [.RW,.LW], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Julián Álvarez", ovrRating: 90, positions: [.ST,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
@@ -1541,6 +1555,135 @@ let _players: [Player] = [
     Player(name: "Ademola Lookman", ovrRating: 89, positions: [.CF,.CAM], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Morgan Rogers", ovrRating: 92, positions: [.LW, .CAM, .RW], team: "Upgraded Players", league: "Upgraded Players"),
     Player(name: "Bradley Barcola", ovrRating: 91, positions: [.LW,.RW], team: "Upgraded Players", league: "Upgraded Players"),
-    Player(name: "Joao Pedro", ovrRating: 95, positions: [.ST, .CAM], team: "Upgraded Players", league: "Upgraded Players"),
+    Player(name: "Joao Pedro", ovrRating: 92, positions: [.ST, .CAM], team: "Upgraded Players", league: "Upgraded Players"),
 
+    // MARK: - Cult Heros
+
+    Player(name: "Dirk Kuyt", ovrRating: 82, positions: [.RW,.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Fabio Borini", ovrRating: 76, positions: [.ST,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Nwankwo Kanu", ovrRating: 83, positions: [.ST,.CAM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Jay-Jay Okocha", ovrRating: 84, positions: [.CAM,.RW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Robbie Fowler", ovrRating: 84, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Diego Luna", ovrRating: 78, positions: [.CAM,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Papiss Cisse", ovrRating: 80, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Demba Ba", ovrRating: 81, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Loic Remy", ovrRating: 80, positions: [.ST,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Wilfred Bony", ovrRating: 82, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Jonjo Shelvey", ovrRating: 78, positions: [.CM,.CDM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Dimitri Payet", ovrRating: 84, positions: [.CAM,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Seydou Doumbia", ovrRating: 81, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Adebayo Akinfenwa", ovrRating: 75, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Nani", ovrRating: 83, positions: [.LW,.RW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Ricardo Quaresma", ovrRating: 82, positions: [.RW,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Gervinho", ovrRating: 81, positions: [.LW,.RW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Hulk", ovrRating: 84, positions: [.RW,.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Fred", ovrRating: 80, positions: [.CM,.CDM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Emmanuel Emenike", ovrRating: 80, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Micah Richards", ovrRating: 80, positions: [.RB,.CB], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Phil Jones", ovrRating: 80, positions: [.CB,.RB], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Marouane Fellaini", ovrRating: 82, positions: [.CM,.CDM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Harry Maguire", ovrRating: 82, positions: [.CB], team: "Cult Heros", league: "Cult Heros"),
+    //Player(name: "Timo Werner", ovrRating: 86, positions: [.ST,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Chris Smalling", ovrRating: 80, positions: [.CB], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Freddy Adu", ovrRating: 67, positions: [.CAM,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Nicklas Bendtner", ovrRating: 78, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Alexandre Pato", ovrRating: 82, positions: [.ST,.LW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Mario Balotelli", ovrRating: 84, positions: [.ST,.CAM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Jozy Altidore", ovrRating: 76, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Oscar", ovrRating: 83, positions: [.CAM,.CM], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Hatem Ben Arfa", ovrRating: 82, positions: [.CAM,.RW], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Vozinha", ovrRating: 74, positions: [.GK], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Divok Origi", ovrRating: 74, positions: [.ST], team: "Cult Heros", league: "Cult Heros"),
+    Player(name: "Samir Nasri", ovrRating: 85, positions: [.LM], team: "Cult Heros", league: "Cult Heros"),
+    
+    
+    
+    // MARK: - Future Superstars UPGRADED CARDS
+
+    Player(name: "Lamine Yamal", ovrRating: 96, positions: [.RW,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Julien Hall", ovrRating: 87, positions: [.ST,.LW,.RW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Estevao", ovrRating: 90, positions: [.RW,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Arda Guler", ovrRating: 87, positions: [.CAM,.RW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Franco Mastantuono", ovrRating: 85, positions: [.CAM,.RW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Geovany Quenda", ovrRating: 88, positions: [.RW,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Sverre Nypan", ovrRating: 85, positions: [.CM,.CAM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Archie Gray", ovrRating: 86, positions: [.CM,.RB], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Leny Yoro", ovrRating: 87, positions: [.CB], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Jorrel Hato", ovrRating: 86, positions: [.LB,.CB], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Antonio Nusa", ovrRating: 85, positions: [.LW,.RW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Cavan Sullivan", ovrRating: 86, positions: [.CAM,.CM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Ayyoub Bouaddi", ovrRating: 90, positions: [.CM,.CAM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Tyrique George", ovrRating: 84, positions: [.ST,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Lennart Karl", ovrRating: 86, positions: [.CAM,.CM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Gilberto Mora", ovrRating: 84, positions: [.CM,.CDM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Rio Ngumoha", ovrRating: 83, positions: [.LW,.ST], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Chris Rigg", ovrRating: 86, positions: [.CM,.CAM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Kendry Paez", ovrRating: 84, positions: [.CAM,.CM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Assane Diao", ovrRating: 85, positions: [.RW,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Endrick", ovrRating: 90, positions: [.ST,.LW], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Brian Madjo", ovrRating: 85, positions: [.ST], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Dastan Satpaev", ovrRating: 85, positions: [.CM,.CDM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Jorthy Mokio", ovrRating: 83, positions: [.CB,.CDM], team: "Future Superstars", league: "Future Superstars"),
+    Player(name: "Jeremy Monga", ovrRating: 86, positions: [.CAM,.RW], team: "Future Superstars", league: "Future Superstars"),
+    
+
+    // MARK: - Womens Stars
+
+    Player(name: "Sam Kerr", ovrRating: 87, positions: [.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Alexia Putellas", ovrRating: 91, positions: [.CAM,.CM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Ada Hegerberg", ovrRating: 90, positions: [.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Megan Rapinoe", ovrRating: 87, positions: [.LW,.CAM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Vivianne Miedema", ovrRating: 88, positions: [.ST,.CAM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Lucy Bronze", ovrRating: 87, positions: [.RB,.CB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Wendie Renard", ovrRating: 88, positions: [.CB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Aitana Bonmatí", ovrRating: 93, positions: [.CM,.CAM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Caroline Graham Hansen", ovrRating: 88, positions: [.RW,.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Sophia Smith", ovrRating: 89, positions: [.ST,.LW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Lauren James", ovrRating: 85, positions: [.LW,.RW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Mary Earps", ovrRating: 86, positions: [.GK], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Millie Bright", ovrRating: 85, positions: [.CB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Kadidiatou Diani", ovrRating: 87, positions: [.RW,.LW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Barbara Bonansea", ovrRating: 84, positions: [.LW,.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Salma Paralluelo", ovrRating: 89, positions: [.LW, .RW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Lindsey Horan", ovrRating: 86, positions: [.CM,.CAM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Ewa Pajor", ovrRating: 87, positions: [.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Trinity Rodman", ovrRating: 90, positions: [.RW,.LW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Mallory Swanson", ovrRating: 86, positions: [.LW,.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Rose Lavelle", ovrRating: 85, positions: [.CAM,.CM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Naomi Girma", ovrRating: 86, positions: [.CB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Guro Reiten", ovrRating: 85, positions: [.LW,.RW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Pernille Harder", ovrRating: 86, positions: [.ST,.LW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Vicky Lopez", ovrRating: 82, positions: [.CAM,.CM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Chloe Kelly", ovrRating: 84, positions: [.RW,.LW], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Emily Fox", ovrRating: 83, positions: [.RB,.LB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Alex Morgan", ovrRating: 85, positions: [.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Marta", ovrRating: 84, positions: [.CAM], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Alessia Russo", ovrRating: 84, positions: [.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Hannah Hampton", ovrRating: 82, positions: [.GK], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Alyssa Thompson", ovrRating: 83, positions: [.LW,.ST], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Sakina Karchaoui", ovrRating: 85, positions: [.LB], team: "Womens Stars", league: "Womens Stars"),
+    Player(name: "Alisha Lehmann", ovrRating: 77, positions: [.LW,.RW], team: "Womens Stars", league: "Womens Stars"),
+    
+    
+
+    // MARK: - Random Bums
+
+    Player(name: "Dele Alli", ovrRating: 70, positions: [.CAM,.CM], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Danny Drinkwater", ovrRating: 70, positions: [.CM,.CDM], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Mario Gotze", ovrRating: 74, positions: [.CAM,.CM], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Tim Ream", ovrRating: 69, positions: [.CB], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Maximiliano Falcon", ovrRating: 65, positions: [.CB,.CDM], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Omari Kellyman", ovrRating: 65, positions: [.ST,.CAM], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Antony Alves Santos", ovrRating: 71, positions: [.RW,.LW], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Matt Freese", ovrRating: 72, positions: [.GK], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Sean Johnson", ovrRating: 71, positions: [.GK], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Christian Benteke", ovrRating: 74, positions: [.ST], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Ryan Browne", ovrRating: 55, positions: [.ST], team: "Random Bums", league: "Random Bums"),
+    Player(name: "Braden Smith", ovrRating: 65, positions: [.CAM], team: "Random Bums", league: "Random Bums"),
+    
+    
+    
+    
+    
+    
 ]

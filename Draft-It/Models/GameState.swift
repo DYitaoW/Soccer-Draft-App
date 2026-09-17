@@ -12,8 +12,12 @@ enum GameMode: String, CaseIterable, Codable {
     case easy = "Easy"
     case normal = "Normal"
     case hard = "Hard"
+    case extreme = "Extreme"
     case mode38 = "38-0"
     case positionsFirst = "Positions First"
+    case transferBudget = "Transfer Budget"
+    case onePerClub = "One Per Club"
+    case noPremierLeague = "No Premier League"
 
     /// The label shown in the UI. "Normal" is presented as "Medium" so the
     /// difficulty row reads Easy / Medium / Hard.
@@ -24,7 +28,72 @@ enum GameMode: String, CaseIterable, Codable {
     /// Whether the mode is a special draft variant (team roll / position pick)
     /// rather than a plain difficulty selection.
     var isSpecialMode: Bool {
-        self == .mode38 || self == .positionsFirst
+        self == .mode38 || self == .positionsFirst || self == .transferBudget || self == .onePerClub || self == .noPremierLeague
+    }
+
+    /// Short description for the game mode selector.
+    var description: String {
+        switch self {
+        case .easy: return "5 rerolls"
+        case .normal: return "3 rerolls"
+        case .hard: return "1 reroll"
+        case .extreme: return "No rerolls"
+        case .mode38: return "Play just like the viral game"
+        case .positionsFirst: return "Pick a position first"
+        case .transferBudget: return "Draft within a transfer budget"
+        case .onePerClub: return "Max 1 player per club"
+        case .noPremierLeague: return "Draft from the world, not the PL"
+        }
+    }
+
+    /// Full description shown on the home screen button.
+    var fullDescription: String {
+        switch self {
+        case .easy: return "5 rerolls, opponents weakened"
+        case .normal: return "3 rerolls, standard difficulty"
+        case .hard: return "1 reroll, opponents boosted"
+        case .extreme: return "No rerolls, opponents heavily boosted"
+        case .mode38: return "Draft all 20 PL teams in one go"
+        case .positionsFirst: return "Pick positions before players"
+        case .transferBudget: return "Draft within a transfer budget"
+        case .onePerClub: return "38-0 with a 1 player per club cap"
+        case .noPremierLeague: return "3 rerolls, Premier League blocked"
+        }
+    }
+
+    /// Number of rerolls for this mode.
+    var rerolls: Int {
+        switch self {
+        case .easy: return 5
+        case .normal: return 3
+        case .hard: return 1
+        case .extreme: return 0
+        case .mode38, .positionsFirst, .onePerClub: return 1
+        case .transferBudget: return 2
+        case .noPremierLeague: return 3
+        }
+    }
+
+    /// OVR boost applied to AI opponents (positive = harder).
+    var opponentBoost: Int {
+        switch self {
+        case .easy: return -3
+        case .normal: return 0
+        case .hard: return 2
+        case .extreme: return 4
+        case .mode38, .positionsFirst, .transferBudget, .onePerClub, .noPremierLeague: return 0
+        }
+    }
+
+    /// OVR boost applied to the player's team (positive = easier).
+    var playerBoost: Int {
+        switch self {
+        case .easy: return 3
+        case .normal: return 0
+        case .hard: return -2
+        case .extreme: return -4
+        case .mode38, .positionsFirst, .transferBudget, .onePerClub, .noPremierLeague: return 0
+        }
     }
 }
 
@@ -47,15 +116,23 @@ class GameState: ObservableObject {
     @Published var gameMode: GameMode
     @Published var selectedTeam: String? = nil
     @Published var teamPlayers: [Player] = []
+    @Published var usedTeams: Set<String> = []
     @Published var showRatings: Bool = true
     @Published var totalRerollsRemaining: Int = 0
     @Published var showPremierLeague: Bool = true
     @Published var showOtherLeagues: Bool = true
     @Published var showGlobalSuperstars: Bool = true
     @Published var showPastLegends: Bool = true
+    @Published var showUpgradedPlayers: Bool = true
+    @Published var showCultHeros: Bool = true
+    @Published var showFutureSuperstars: Bool = true
+    @Published var showWomensStars: Bool = true
+    @Published var showRandomBums: Bool = true
     @Published var managerRevealed: Bool = false
     @Published var gamePhase: String = "drafting"
     @Published var cupCompetitionTypeRaw: String? = nil
+    @Published var transferBudget: Int = 0
+    @Published var transferBudgetRemaining: Int = 0
 
     /// How many formation slots are still unfilled.
     var remainingSlots: Int {
@@ -74,8 +151,11 @@ class GameState: ObservableObject {
     /// Whether the current session is the "Positions First" game mode.
     var isPositionsFirst: Bool { gameMode == .positionsFirst }
 
-    /// Whether the mode uses the roll-a-team draft (38-0 and Positions First).
-    var usesTeamDraft: Bool { isMode38 || isPositionsFirst }
+    /// Whether the current session is the "Transfer Budget" game mode.
+    var isTransferBudget: Bool { gameMode == .transferBudget }
+
+    /// Whether the mode uses the roll-a-team draft (38-0, Positions First, One Per Club).
+    var usesTeamDraft: Bool { isMode38 || isPositionsFirst || gameMode == .onePerClub }
 
     /// Whether the mode has a substitute bench. Team-draft modes have no bench.
     var hasBench: Bool { !usesTeamDraft }
@@ -102,6 +182,74 @@ class GameState: ObservableObject {
         totalRerollsRemaining -= 1
     }
 
+    /// Calculates a player's transfer value based on overall rating and position.
+    /// Returns value in millions (e.g. 25 means $25M).
+    /// Pricing is non-linear: 87+ has big jumps, 80-86 is linear, 79- drops fast.
+    func transferValue(for player: Player) -> Int {
+        let ovr = player.ovrRating
+        let primary = player.positions.first ?? .ST
+
+        // Position multiplier
+        let posMul: Double
+        switch primary {
+        case .ST, .CF: posMul = 1.4
+        case .LW, .RW, .LM, .RM: posMul = 1.2
+        case .CAM: posMul = 1.2
+        case .CM: posMul = 1.0
+        case .CDM: posMul = 1.1
+        case .CB: posMul = ovr >= 90 ? 0.95 : ovr >= 87 ? 0.92 : ovr >= 85 ? 0.88 : 0.8
+        case .LB, .RB, .LWB, .RWB: posMul = 0.65
+        case .GK: posMul = 0.65
+        }
+
+        // Non-linear OVR curve: big jumps at 87+, linear 80-86, fast drop below 79
+        let ovrBase: Double
+        switch ovr {
+        case 99: ovrBase = 200
+        case 98: ovrBase = 180
+        case 97: ovrBase = 160
+        case 96: ovrBase = 140
+        case 95: ovrBase = 120
+        case 94: ovrBase = 105
+        case 93: ovrBase = 92
+        case 92: ovrBase = 82
+        case 91: ovrBase = 78
+        case 90: ovrBase = 74
+        case 89: ovrBase = 75
+        case 88: ovrBase = 70
+        case 87: ovrBase = 68
+        // Linear band 80-86 (~$6-7M per point)
+        case 86: ovrBase = 65
+        case 85: ovrBase = 58
+        case 84: ovrBase = 50
+        case 83: ovrBase = 42
+        case 82: ovrBase = 35
+        case 81: ovrBase = 28
+        case 80: ovrBase = 22
+        // Fast drop below 80
+        case 79: ovrBase = 17
+        case 78: ovrBase = 13
+        case 77: ovrBase = 9
+        case 76: ovrBase = 6
+        case 75: ovrBase = 3.5
+        default: ovrBase = max(1, Double(ovr - 68) * 0.5)
+        }
+
+        return max(1, Int(ovrBase * posMul))
+    }
+
+    /// Whether the player can be afforded with the remaining budget.
+    func canAfford(_ player: Player) -> Bool {
+        guard gameMode == .transferBudget else { return true }
+        return transferValue(for: player) <= transferBudgetRemaining
+    }
+
+    /// Deducts a player's transfer value from the remaining budget.
+    func spendBudget(for player: Player) {
+        guard gameMode == .transferBudget else { return }
+        transferBudgetRemaining -= transferValue(for: player)
+    }
+
     /// Total unfilled starting slots.
     var totalRemaining: Int {
         selectedFormation.slots.count - assignedPlayers.count
@@ -109,7 +257,7 @@ class GameState: ObservableObject {
 
     /// Creates a game state for a draft session. Reroll count is derived from
     /// the game mode.
-    init(formation: Formation, mode: GameMode = .normal, showRatings: Bool = true, showPremierLeague: Bool = true, showOtherLeagues: Bool = true, showGlobalSuperstars: Bool = true, showPastLegends: Bool = true, managerRevealed: Bool = false, gamePhase: String = "drafting", cupCompetitionTypeRaw: String? = nil) {
+    init(formation: Formation, mode: GameMode = .normal, showRatings: Bool = true, showPremierLeague: Bool = true, showOtherLeagues: Bool = true, showGlobalSuperstars: Bool = true, showPastLegends: Bool = true, showUpgradedPlayers: Bool = true, showCultHeros: Bool = true, showFutureSuperstars: Bool = true, showWomensStars: Bool = true, showRandomBums: Bool = true, managerRevealed: Bool = false, gamePhase: String = "drafting", cupCompetitionTypeRaw: String? = nil, transferBudgetAmount: Int = 100) {
         self.selectedFormation = formation
         self.gameMode = mode
         self.showRatings = showRatings
@@ -117,10 +265,19 @@ class GameState: ObservableObject {
         self.showOtherLeagues = showOtherLeagues
         self.showGlobalSuperstars = showGlobalSuperstars
         self.showPastLegends = showPastLegends
+        self.showUpgradedPlayers = showUpgradedPlayers
+        self.showCultHeros = showCultHeros
+        self.showFutureSuperstars = showFutureSuperstars
+        self.showWomensStars = showWomensStars
+        self.showRandomBums = showRandomBums
         self.managerRevealed = managerRevealed
         self.gamePhase = gamePhase
         self.cupCompetitionTypeRaw = cupCompetitionTypeRaw
-        self.totalRerollsRemaining = mode == .easy ? 3 : mode == .normal ? 1 : mode == .mode38 || mode == .positionsFirst ? 1 : 0
+        self.totalRerollsRemaining = mode.rerolls
+        if mode == .transferBudget {
+            self.transferBudget = transferBudgetAmount
+            self.transferBudgetRemaining = transferBudgetAmount
+        }
     }
 
     /// Assigns a player to the given formation slot index and saves progress.
@@ -193,8 +350,9 @@ class GameState: ObservableObject {
         let players = assignedPlayers.values.map { $0 }
         guard players.count == selectedFormation.slots.count else { return }
         let dynastyCount = UserDefaults.standard.integer(forKey: "dynastySeasonCount")
-        let difficulty = min(1.0, Double(dynastyCount) * 0.25)
-        seasonOdds = SeasonOdds.calculate(playerTeam: adjustedPlayerTeam, opponents: leagueTeams, difficulty: difficulty)
+        let difficulty = min(3.0, Double(dynastyCount) * 0.25)
+        let dynastyBoost = min(6, dynastyCount)
+        seasonOdds = SeasonOdds.calculate(playerTeam: adjustedPlayerTeam, opponents: leagueTeams, difficulty: difficulty, gameMode: gameMode, dynastyBoost: dynastyBoost)
     }
 
     /// Picks a random club as the user's team and loads its players, then saves.
@@ -219,18 +377,61 @@ class GameState: ObservableObject {
         }
     }
 
-    /// Average overall rating of starters in the given category.
-    /// Returns 0 when no starters occupy that category.
+    /// Average overall rating of starters in the given category, with star
+    /// multiplier applied. Returns 0 when no starters occupy that category.
     /// - Parameter category: The position category to average.
-    /// - Returns: The average rating, or 0 if empty.
+    /// - Returns: The adjusted average rating, or 0 if empty.
     func rating(for category: PositionCategory) -> Double {
         let ratings: [Double] = selectedFormation.slots.enumerated().compactMap { index, slot in
             guard self.category(for: slot.position) == category,
                   let player = assignedPlayers[index] else { return nil }
-            return Double(player.ovrRating)
+            let ovr = Double(player.ovrRating)
+            // Star multiplier: non-linear boost for elite players
+            if ovr >= 95 { return ovr + 4.0 }
+            if ovr >= 92 { return ovr + 2.5 }
+            if ovr >= 90 { return ovr + 1.5 }
+            return ovr
         }
         guard !ratings.isEmpty else { return 0 }
         return ratings.reduce(0, +) / Double(ratings.count)
+    }
+
+    /// Calculates the weak-link penalty for a category. Players well below the
+    /// category average drag the team down, especially when mismatched against
+    /// the opponent's strength. Returns a negative adjustment (penalty).
+    /// - Parameters:
+    ///   - category: The position category to evaluate.
+    ///   - opponentStrength: The opposing team's relevant strength rating
+    ///     (offense for defenders, defense for attackers, either for midfield).
+    func weakLinkPenalty(for category: PositionCategory, opponentStrength: Double) -> Double {
+        let slots = selectedFormation.slots.enumerated().compactMap { index, slot -> Double? in
+            guard self.category(for: slot.position) == category,
+                  let player = assignedPlayers[index] else { return nil }
+            return Double(player.ovrRating)
+        }
+        guard slots.count > 1 else { return 0 }
+
+        let avg = slots.reduce(0, +) / Double(slots.count)
+        guard let minRating = slots.min() else { return 0 }
+
+        let gap = avg - minRating
+        guard gap > 5 else { return 0 }
+
+        // Base penalty scales with the gap
+        var penalty = (gap - 5) * 0.08
+
+        // Amplify penalty when weak link is mismatched against opponent strength
+        let strengthGap = opponentStrength - minRating
+        if strengthGap > 10 {
+            penalty *= 1.0 + (strengthGap - 10) * 0.03
+        }
+
+        // Midfield weak links affect both attack and defense
+        if category == .midfield {
+            penalty *= 1.2
+        }
+
+        return -min(penalty, 4.0)
     }
 
     var attackRating: Double { rating(for: .attack) }
@@ -296,6 +497,26 @@ class GameState: ObservableObject {
             goalkeeper: Int(adjustedGkRating.rounded())
         )
     }
+
+    /// Returns weak-link penalties for each outfield category against a given
+    /// opponent team. The penalties are additive adjustments to apply to the
+    /// corresponding expected-goals calculation.
+    /// - Parameter opponent: The opposing team's ratings.
+    /// - Returns: (attack, midfield, defense) penalties as Doubles.
+    func weakLinkPenalties(vs opponent: Team) -> (attack: Double, midfield: Double, defense: Double) {
+        let atkPen = weakLinkPenalty(for: .attack, opponentStrength: Double(opponent.defense))
+        let midPen = weakLinkPenalty(for: .midfield, opponentStrength: Double(max(opponent.offense, opponent.defense)))
+        let defPen = weakLinkPenalty(for: .defense, opponentStrength: Double(opponent.offense))
+        return (atkPen, midPen, defPen)
+    }
+
+    /// Cup variant: returns weak-link penalties against a CupTeam opponent.
+    func weakLinkPenalties(vs opponent: CupTeam) -> (attack: Double, midfield: Double, defense: Double) {
+        let atkPen = weakLinkPenalty(for: .attack, opponentStrength: Double(opponent.defense))
+        let midPen = weakLinkPenalty(for: .midfield, opponentStrength: Double(max(opponent.offense, opponent.defense)))
+        let defPen = weakLinkPenalty(for: .defense, opponentStrength: Double(opponent.offense))
+        return (atkPen, midPen, defPen)
+    }
 }
 
 // MARK: - Save / Load
@@ -320,6 +541,9 @@ struct SavedGame: Codable {
     let managerRevealed: Bool
     let gamePhase: String
     let cupCompetitionTypeRaw: String?
+    let transferBudget: Int
+    let transferBudgetRemaining: Int
+    let usedTeams: [String]
 
     /// Rebuilds a live `GameState` from this snapshot.
     /// - Returns: A `GameState` populated with the saved squad and settings.
@@ -332,6 +556,9 @@ struct SavedGame: Codable {
         gs.selectedTeam = selectedTeam
         gs.teamPlayers = teamPlayers
         gs.totalRerollsRemaining = totalRerollsRemaining
+        gs.transferBudget = transferBudget
+        gs.transferBudgetRemaining = transferBudgetRemaining
+        gs.usedTeams = Set(usedTeams)
         return gs
     }
 
@@ -355,7 +582,10 @@ struct SavedGame: Codable {
             showPastLegends: gameState.showPastLegends,
             managerRevealed: gameState.managerRevealed,
             gamePhase: gameState.gamePhase,
-            cupCompetitionTypeRaw: gameState.cupCompetitionTypeRaw
+            cupCompetitionTypeRaw: gameState.cupCompetitionTypeRaw,
+            transferBudget: gameState.transferBudget,
+            transferBudgetRemaining: gameState.transferBudgetRemaining,
+            usedTeams: Array(gameState.usedTeams)
         )
         guard let data = try? JSONEncoder().encode(saved),
               let url = saveURL else { return }

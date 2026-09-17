@@ -14,6 +14,8 @@ struct SettingsView: View {
     @AppStorage("expandedManagerialDecisions") private var expandedManagerialDecisions = true
     @AppStorage("dynastyMode") private var dynastyMode = true
     @AppStorage("playablePenalties") private var playablePenalties = true
+    @AppStorage("advancedManagers") private var advancedManagers = true
+    @AppStorage("homeShowRatings") private var showRatings: Bool = true
     @State private var stats: CareerStats = .load()
     @State private var showResetConfirm = false
     @State private var teamNameBuffer = ""
@@ -120,6 +122,44 @@ struct SettingsView: View {
                     .padding(.vertical, 10)
 
                 HStack {
+                    Text("Advanced Managers")
+                        .font(.headline)
+                    Spacer()
+                    Toggle("", isOn: $advancedManagers)
+                        .labelsHidden()
+                }
+                .padding(.horizontal, 20)
+
+                Text("Choose from 3 random managers instead of 1")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+
+                Divider()
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+
+                HStack {
+                    Text("Show Ratings")
+                        .font(.headline)
+                    Spacer()
+                    Toggle("", isOn: $showRatings)
+                        .labelsHidden()
+                }
+                .padding(.horizontal, 20)
+
+                Text("Display player ratings during draft")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+
+                Divider()
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+
+                HStack {
                     Text("Team Name")
                         .font(.headline)
                     Spacer()
@@ -191,7 +231,8 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .frame(maxWidth: 340, maxHeight: 550)
+        .frame(maxWidth: 340)
+        .frame(minHeight: 300, maxHeight: .infinity)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.2), radius: 20)

@@ -320,17 +320,6 @@ struct KnockoutEndView: View {
                 .padding(.horizontal)
             }
 
-            Button(action: onComplete) {
-                Text("View Full Results")
-                    .frame(maxWidth: .infinity)
-                    .font(.headline.weight(.bold))
-            }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.roundedRectangle(radius: 10))
-            .controlSize(.large)
-            .tint(.green)
-            .padding(.horizontal)
-
             Spacer()
         }
     }

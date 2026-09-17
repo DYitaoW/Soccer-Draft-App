@@ -327,11 +327,15 @@ struct TeamDraftView: View {
 
     /// Assigns `player` to the first empty slot matching `position`, then hides
     /// the player list and clears the selected team. In Positions First mode the
-    /// selected position is cleared once it has no slots left.
+    /// selected position is cleared once it has no slots left. In One Per Club
+    /// mode the team is marked as used so no further players can be taken from it.
     private func assign(player: Player, to position: Position) {
         for (idx, slot) in gameState.selectedFormation.slots.enumerated() {
             if slot.position == position && gameState.assignedPlayers[idx] == nil {
                 gameState.assignPlayer(player, toSlot: idx)
+                if gameState.gameMode == .onePerClub {
+                    gameState.usedTeams.insert(player.team)
+                }
                 expandedPlayer = nil
                 if gameState.isPositionsFirst, !openPositions.contains(position) {
                     draftPosition = nil
@@ -402,7 +406,17 @@ struct TeamDraftView: View {
         } else {
             pool = global
         }
-        return pool.isEmpty ? GameData.allTeams.randomElement() ?? "Unknown" : pool.randomElement()!
+        let available = pool.filter { !gameState.usedTeams.contains($0) }
+        if available.isEmpty {
+            let fallback = pool.filter { !gameState.usedTeams.contains($0) }
+            if fallback.isEmpty {
+                let allAvailable = pl + other + legends + global
+                let anyLeft = allAvailable.filter { !gameState.usedTeams.contains($0) }
+                return anyLeft.isEmpty ? (GameData.allTeams.first ?? "Unknown") : anyLeft.randomElement()!
+            }
+            return fallback.randomElement()!
+        }
+        return available.randomElement()!
     }
 
     /// Rolls a random team (with a cycling animation unless fast mode is on),

@@ -4,6 +4,17 @@
 /// penalties, and advancement to the next round.
 import SwiftUI
 
+private struct SelectedSpeedStyle: ViewModifier {
+    let isSelected: Bool
+    func body(content: Content) -> some View {
+        if isSelected {
+            content.buttonStyle(.borderedProminent)
+        } else {
+            content.buttonStyle(.bordered)
+        }
+    }
+}
+
 /// Data shown in the full-screen goal popup that flashes when a knockout goal
 /// is scored: who scored, the updated scoreline (home score on the left, away
 /// on the right, matching the scoreboard), and whether it was the user.
@@ -64,6 +75,7 @@ struct CupKnockoutView: View {
     @State private var penaltyOpponentResolving = false
     @State private var penaltyOpponentResult: Bool? = nil
 
+    @State private var currentSpeed: Double = 1.0
     @State private var commentaryEvents: [(minute: Int, text: String, teamId: UUID?)] = []
     @State private var goalFlashId: UUID? = nil
     @State private var goalPopup: GoalPopupInfo? = nil
@@ -446,6 +458,35 @@ struct CupKnockoutView: View {
                         scoreboard
                             .padding(.horizontal)
 
+                        // Speed buttons right below scoreboard
+                        HStack(spacing: 8) {
+                            Button(action: { fastModeToggle(1.0) }) {
+                                Text("1x")
+                                    .font(.headline.weight(.bold))
+                            }
+                            .modifier(SelectedSpeedStyle(isSelected: currentSpeed == 1.0))
+                            .buttonBorderShape(.roundedRectangle(radius: 10))
+                            .tint(.green)
+
+                            Button(action: { fastModeToggle(2.0) }) {
+                                Text("2x")
+                                    .font(.headline.weight(.bold))
+                            }
+                            .modifier(SelectedSpeedStyle(isSelected: currentSpeed == 2.0))
+                            .buttonBorderShape(.roundedRectangle(radius: 10))
+                            .tint(.orange)
+
+                            Button(action: { fastModeToggle(3.0) }) {
+                                Text("3x")
+                                    .font(.headline.weight(.bold))
+                            }
+                            .modifier(SelectedSpeedStyle(isSelected: currentSpeed == 3.0))
+                            .buttonBorderShape(.roundedRectangle(radius: 10))
+                            .tint(.red)
+                        }
+                        .padding(.horizontal)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
                         KnockoutScorersBox(
                             homeGoals: shownGoals.filter { $0.teamId == hTeam.id },
                             awayGoals: shownGoals.filter { $0.teamId == aTeam.id }
@@ -562,14 +603,16 @@ struct CupKnockoutView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 30)
                     }
-                } else if matchDone {
+                } else {
                     if penaltyActive && playablePenalties {
                         penaltyShootoutFooter
                     } else {
                         VStack(spacing: 0) {
-                            HStack(spacing: 8) {
-                                Button(action: { fastModeToggle(1.0) }) {
-                                    Text("1x")
+                            if !matchDone {
+                                Button(action: {
+                                    skipToResult()
+                                }) {
+                                    Text("Skip to Result")
                                         .frame(maxWidth: .infinity)
                                         .font(.headline.weight(.bold))
                                 }
@@ -577,42 +620,31 @@ struct CupKnockoutView: View {
                                 .buttonBorderShape(.roundedRectangle(radius: 10))
                                 .controlSize(.large)
                                 .tint(.green)
-                                
-                                Button(action: { fastModeToggle(2.0) }) {
-                                    Text("2x")
+                                .padding(.horizontal)
+                                .padding(.bottom, 30)
+                            } else {
+                                Button(action: {
+                                    let legs = maxLegs[min(currentRoundIndex, maxLegs.count - 1)]
+                                    if legs > 1 && currentLegIndex == 0 {
+                                        currentLegIndex = 1
+                                        withAnimation { phase = .legBreak }
+                                    } else {
+                                        updatePlayerMatchup()
+                                        withAnimation { phase = .showingResults }
+                                    }
+                                }) {
+                                    Text(currentLegIndex < maxLegs[min(currentRoundIndex, maxLegs.count - 1)] - 1
+                                         ? "Continue to Second Leg" : "Continue to Penalties")
                                         .frame(maxWidth: .infinity)
                                         .font(.headline.weight(.bold))
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .buttonBorderShape(.roundedRectangle(radius: 10))
                                 .controlSize(.large)
-                                .tint(.orange)
-                                
-                                Button(action: { fastModeToggle(3.0) }) {
-                                    Text("3x")
-                                        .frame(maxWidth: .infinity)
-                                        .font(.headline.weight(.bold))
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .buttonBorderShape(.roundedRectangle(radius: 10))
-                                .controlSize(.large)
-                                .tint(.red)
+                                .tint(.green)
+                                .padding(.horizontal)
+                                .padding(.bottom, 30)
                             }
-                            
-                            Button(action: {
-                                updatePlayerMatchup()
-                                withAnimation { phase = .showingResults }
-                            }) {
-                                Text("Continue to Result")
-                                    .frame(maxWidth: .infinity)
-                                    .font(.headline.weight(.bold))
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.roundedRectangle(radius: 10))
-                            .controlSize(.large)
-                            .tint(.green)
-                            .padding(.horizontal)
-                            .padding(.bottom, 30)
                         }
                     }
                 }
@@ -908,7 +940,13 @@ private var scoreboard: AnyView {
                 return
             }
 
-            let speedMultiplier = 1.0 / simulationSpeed
+            let effectiveSpeed: Double
+            switch simulationSpeed {
+            case 1.0:  effectiveSpeed = 0.5    // 1x: twice as slow as before
+            case 2.0:  effectiveSpeed = 1.0    // 2x: what old 1x was
+            default:   effectiveSpeed = 3.0    // 3x: unchanged
+            }
+            let speedMultiplier = 1.0 / effectiveSpeed
             let d: Int
             if goalPopup != nil {
                 // Hold a moment longer so the goal celebration is visible.
@@ -1301,20 +1339,8 @@ private var scoreboard: AnyView {
                   //  .padding(.vertical, 8)
                     .padding(.bottom, 30)
                 } else {
-                    Button(action: {
-                        onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
-                    }) {
-                        Text("View Full Results")
-                            .frame(maxWidth: .infinity)
-                            .font(.headline.weight(.bold))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.roundedRectangle(radius: 10))
-                    .controlSize(.large)
-                    .tint(.green)
-                    .padding(.horizontal)
-                    .padding(.bottom, 30)
-                  //  .padding(.vertical, 8)
+                    // Auto-advance to end view
+                    EmptyView()
                 }
             }
          //   .background(Color(.systemGray6))
@@ -1324,8 +1350,14 @@ private var scoreboard: AnyView {
                 eliminated = true
                 eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
                 isChampion = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    withAnimation { phase = .end }
+                }
             } else if currentRoundIndex >= 4 {
                 isChampion = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    withAnimation { phase = .end }
+                }
             }
         }
     }
@@ -1341,6 +1373,11 @@ private var scoreboard: AnyView {
             eliminatedIn: eliminatedIn,
             onComplete: { onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats()) }
         )
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
+            }
+        }
     }
 
     // MARK: - Logic
@@ -1413,6 +1450,14 @@ private var scoreboard: AnyView {
     /// Toggles the simulation speed: 1x, 2x, or 3x
     private func fastModeToggle(_ speed: Double) {
         simulationSpeed = speed
+        currentSpeed = speed
+    }
+
+    /// Instantly finishes the current match by jumping to the final minute
+    /// and revealing all goals at once.
+    private func skipToResult() {
+        currentMinute = maxMinute
+        shownGoals = currentGoals
     }
 }
 

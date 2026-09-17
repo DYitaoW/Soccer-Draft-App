@@ -597,7 +597,9 @@ struct CupModels {
     ///   - baseHome/baseAway: Baseline scoring before matchups.
     ///   - floor: Minimum expected goals, guarding against a shutout ceiling.
     ///   - edgeScale: Multiplier for the matchup edges (reduced for 30-minute ET).
-    static func expectedGoals(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, homePlayerBonus: Double = 0.0, awayPlayerBonus: Double = 0.0, homeAdvantage: Double = 0.10, variance: Double = 0.13, baseHome: Double = 1.16, baseAway: Double = 1.04, floor: Double = 0.12, edgeScale: Double = 1.0) -> (home: Double, away: Double) {
+    ///   - homeWeakLinkPenalties: Attack/midfield/def penalty for the home team's weak links.
+    ///   - awayWeakLinkPenalties: Attack/midfield/def penalty for the away team's weak links.
+    static func expectedGoals(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, homePlayerBonus: Double = 0.0, awayPlayerBonus: Double = 0.0, homeAdvantage: Double = 0.10, variance: Double = 0.13, baseHome: Double = 1.16, baseAway: Double = 1.04, floor: Double = 0.12, edgeScale: Double = 1.0, homeWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0), awayWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)) -> (home: Double, away: Double) {
         // Position-wise matchups: offense vs the opponent's defense, offense vs
         // the opponent's goalkeeper, and midfield vs midfield.
         let homeAttEdge = Double(home.offense - away.defense) * edgeScale
@@ -619,15 +621,23 @@ struct CupModels {
         let homeVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * variance) * awayDefFactor
         let awayVar = (1.0 + (Double.random(in: 0...1) * 2 - 1) * variance) * homeDefFactor
 
+        // Momentum/Pressure: Big Team Closing & Comeback Scaling
+        // Higher-rated teams close out games better and mount bigger comebacks.
+        let overallDiff = Double(home.overall - away.overall)
+        let momentumScale = 0.003 // Tuning knob: how much overall difference matters
+        let homeMomentum = 1.0 + overallDiff * momentumScale
+        let awayMomentum = 1.0 - overallDiff * momentumScale
+
         // Attack carries the largest weight on goals scored; the goalkeeper edge
         // outweighs the outfield-defense edge so a weak keeper concedes more.
-        let homeExp = max(floor, (baseHome + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homePlayerBonus) * homeForm * homeVar)
-        let awayExp = max(floor, (baseAway + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayPlayerBonus) * awayForm * awayVar)
+        // Weak link penalties reduce scoring when a player is outmatched.
+        let homeExp = max(floor, (baseHome + homeAttEdge * 0.042 + homeGkEdge * 0.052 + homeMidEdge * 0.030 + homeAdvantage + homePlayerBonus + homeWeakLinkPenalties.attack + homeWeakLinkPenalties.midfield * 0.5) * homeForm * homeVar * homeMomentum)
+        let awayExp = max(floor, (baseAway + awayAttEdge * 0.042 + awayGkEdge * 0.052 + awayMidEdge * 0.030 + awayPlayerBonus + awayWeakLinkPenalties.attack + awayWeakLinkPenalties.midfield * 0.5) * awayForm * awayVar * awayMomentum)
 
         return (homeExp, awayExp)
     }
 
-    static func simulateCupMatch(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, playerBonus: Double = 1.0) -> (Int, Int) {
+    static func simulateCupMatch(home: CupTeam, away: CupTeam, homeForm: Double = 1.0, awayForm: Double = 1.0, playerBonus: Double = 1.0, homeWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0), awayWeakLinkPenalties: (attack: Double, midfield: Double, defense: Double) = (0, 0, 0)) -> (Int, Int) {
         let isPlayerHome = home.name == customTeamName()
         let isPlayerAway = away.name == customTeamName()
 
@@ -635,7 +645,7 @@ struct CupModels {
         let homeBonus = isPlayerHome ? 0.12 * playerBonus : 0.0
         let awayBonus = isPlayerAway ? 0.08 * playerBonus : 0.0
 
-        let exp = expectedGoals(home: home, away: away, homeForm: homeForm, awayForm: awayForm, homePlayerBonus: homeBonus, awayPlayerBonus: awayBonus, homeAdvantage: 0.10, variance: 0.13)
+        let exp = expectedGoals(home: home, away: away, homeForm: homeForm, awayForm: awayForm, homePlayerBonus: homeBonus, awayPlayerBonus: awayBonus, homeAdvantage: 0.10, variance: 0.13, homeWeakLinkPenalties: homeWeakLinkPenalties, awayWeakLinkPenalties: awayWeakLinkPenalties)
 
         return (poisson(exp.home), poisson(exp.away))
     }
