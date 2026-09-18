@@ -5,8 +5,8 @@
 import SwiftUI
 
 /// Modal showing the player's career records from `CareerStats`: league and
-/// Super League tiles, and buttons opening `AchievementsView` and
-/// `DraftHistoryView`.
+/// Super League tiles, and buttons opening `AchievementsView`, `DraftHistoryView`,
+/// and Game Center dashboard.
 struct CareerStatsView: View {
     @State private var stats: CareerStats = .load()
     @State private var showDraftHistory = false
@@ -17,8 +17,13 @@ struct CareerStatsView: View {
     /// Scrim color behind the draft-history overlay, adapted to the color scheme.
     private var adaptiveOverlay: Color { adaptiveOverlayColor(for: colorScheme) }
 
-    /// Card layout with two stat grids and buttons opening the achievements
-    /// and draft-history modals. The card content fades out while a sub-popup
+    /// Returns `true` if either the achievements or draft-history modal is active.
+    private var subPopupOpen: Bool {
+        showAchievements || showDraftHistory
+    }
+
+    /// Card layout with two stat grids and buttons opening the achievements,
+    /// draft-history, and Game Center modals. The card content fades out while a sub-popup
     /// is open so only one layer is visible at a time.
     var body: some View {
         VStack(spacing: 0) {
@@ -65,8 +70,8 @@ struct CareerStatsView: View {
                 StatTile(label: "Cups Won", value: "\(stats.superLeagueCupsWon)", color: .cyan)
             }
             .padding(.horizontal, 16)
-            HStack {
-                
+
+            HStack(spacing: 8) {
                 Button(action: {
                     showAchievements = true
                 }) {
@@ -75,23 +80,29 @@ struct CareerStatsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.roundedRectangle(radius: 10))
-                .padding(.bottom, 15)
-                .padding(.top, 15)
                 .tint(.orange)
-                .padding(.trailing, 15)
-                
+
                 Button(action: {
                     showDraftHistory = true
                 }) {
-                    Text("Past Seasons  ")
+                    Text("Past Seasons")
                         .font(.subheadline.weight(.bold))
                 }
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.roundedRectangle(radius: 10))
-                .padding(.bottom, 15)
-                .padding(.top, 15)
                 .tint(.green)
+
+                Button(action: {
+                    GameCenterManager.shared.presentDashboard()
+                }) {
+                    Image(systemName: "gamecontroller.fill")
+                        .font(.subheadline.weight(.bold))
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle(radius: 10))
+                .tint(.purple)
             }
+            .padding(.vertical, 15)
         }
         .opacity(subPopupOpen ? 0 : 1)
         .frame(maxWidth: 340)
@@ -119,12 +130,9 @@ struct CareerStatsView: View {
                     .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
         }
-        .animation(.easeOut(duration: 0.2), value: showDraftHistory)
-        .animation(.easeOut(duration: 0.2), value: showAchievements)
+        .animation(.easeInOut(duration: 0.2), value: showAchievements)
+        .animation(.easeInOut(duration: 0.2), value: showDraftHistory)
     }
-
-    /// True while either sub-popup is presented.
-    private var subPopupOpen: Bool { showAchievements || showDraftHistory }
 }
 
 /// One grid cell in the career-stats layout: bold colored value above a small

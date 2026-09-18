@@ -74,6 +74,7 @@ struct CupKnockoutView: View {
     @State private var penaltyActive = false
     @State private var penaltyOpponentResolving = false
     @State private var penaltyOpponentResult: Bool? = nil
+    @State private var isProcessingAction = false
 
     @State private var currentSpeed: Double = 1.0
     @State private var commentaryEvents: [(minute: Int, text: String, teamId: UUID?)] = []
@@ -107,7 +108,7 @@ struct CupKnockoutView: View {
             case .showingResults:
                 resultsView
             case .end:
-                endView
+                EmptyView()
             }
         }
         .overlay {
@@ -149,15 +150,6 @@ struct CupKnockoutView: View {
 
     // MARK: - Helpers
 
-    /// Builds a plausible 11-player name list for an AI team, falling back to
-    /// Resolves real squad names for an AI club from the player database, so the
-    /// live feed uses actual players where they exist. Some super-league clubs
-    /// are known by a different name in the database (Leipzig vs RB Leipzig,
-    /// Villarreal vs Villareal), and some have no players at all — those fall
-    /// back to nationality-appropriate generated squad names.
-    /// - Parameters:
-    ///   - teamName: The AI club's display name.
-    ///   - ids: Player IDs to exclude from the result.
     private static func playerNamesForTeam(_ teamName: String, exclude ids: Set<UUID> = []) -> [String] {
         let aliases: [String: String] = [
             "Leipzig": "RB Leipzig",
@@ -171,14 +163,10 @@ struct CupKnockoutView: View {
         return SimulatedKnockoutLeg.squadNames(for: teamName, count: 11)
     }
 
-    /// The player's cup team, looked up by `playerTeamId`.
     private var playerTeam: CupTeam {
         cupTeams.first { $0.id == playerTeamId } ?? CupModels.playerTeam
     }
 
-    /// Player names for the current drawn opponent. Names already on the user's
-    /// squad are excluded (a drafted player should not line up against his own
-    /// club), falling back to the full list if that would empty it.
     private func opponentPlayerNames() -> [String] {
         guard let opp = opponent else { return [] }
         let names = Self.playerNamesForTeam(opp.name)
@@ -189,17 +177,13 @@ struct CupKnockoutView: View {
 
     // MARK: - Setup
 
-    /// Prepares a knockout round: builds the matchups for the current round index,
-    /// pre-simulates all non-player ties (using simulated legs or random penalty
-    /// resolution for drawn aggregates), resolves the player's actual opponent, and
-    /// transitions to `.drawing`. Eliminates the player early if they are not in
-    /// this round or the round is out of range.
     private func setupRound() {
         aggregateTiebreakerWon = false
+        isProcessingAction = false
         guard currentRoundIndex < knockoutRounds.count, currentRoundIndex < maxLegs.count else {
             eliminated = true
             eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
-            phase = .end
+            onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
             return
         }
 
@@ -210,7 +194,7 @@ struct CupKnockoutView: View {
         guard playerInRound else {
             eliminated = true
             eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
-            phase = .end
+            onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
             return
         }
 
@@ -299,8 +283,6 @@ struct CupKnockoutView: View {
 
     // MARK: - Draw
 
-    /// Runs the animated opponent draw: cycles random team names for ~1.5s, locks
-    /// the actual opponent, then transitions to `.intro`.
     private func startDraw() {
         displayName = ""
         lockedOpponent = false
@@ -346,9 +328,6 @@ struct CupKnockoutView: View {
 
     // MARK: - Simulation
 
-    /// Begins a leg by simulating it up front and revealing it minute-by-minute
-    /// via `simulateMinuteByMinute`. Sets up home/away teams, player names,
-    /// mentality, and extra-time allowances.
     private func startSimulation() {
         let isFinal = currentRoundIndex >= 4
         guard opponent != nil else { return }
@@ -409,8 +388,6 @@ struct CupKnockoutView: View {
         simulateMinuteByMinute(leg: leg, id: currentId)
     }
 
-    /// Resumes a paused simulation, restarting the minute-by-minute reveal
-    /// from the current minute.
     private func resumeSimulation() {
         guard let leg = currentLegData else { return }
         let isETResume = showETBreak || showETSecondBreak
@@ -429,9 +406,6 @@ struct CupKnockoutView: View {
         simulateMinuteByMinute(leg: leg, id: currentId)
     }
 
-    /// Minute-by-minute match reveal: scoreboard, scorers, commentary, half-time /
-    /// extra-time breaks, and the Continue / penalty footer. In leg 2 it shows
-    /// the aggregate score.
     private var simulationView: AnyView {
         let isLeg2 = currentLegIndex == 1
 
@@ -458,7 +432,6 @@ struct CupKnockoutView: View {
                         scoreboard
                             .padding(.horizontal)
 
-                        // Speed buttons right below scoreboard
                         HStack(spacing: 8) {
                             Button(action: { fastModeToggle(1.0) }) {
                                 Text("1x")
@@ -558,7 +531,10 @@ struct CupKnockoutView: View {
                 if showHTBreak {
                     VStack(spacing: 0) {
                         Button(action: {
+                            guard !isProcessingAction else { return }
+                            isProcessingAction = true
                             resumeSimulation()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { isProcessingAction = false }
                         }) {
                             Text("Continue to Second Half")
                                 .frame(maxWidth: .infinity)
@@ -574,7 +550,10 @@ struct CupKnockoutView: View {
                 } else if showETBreak {
                     VStack(spacing: 0) {
                         Button(action: {
+                            guard !isProcessingAction else { return }
+                            isProcessingAction = true
                             resumeSimulation()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { isProcessingAction = false }
                         }) {
                             Text("Start Extra Time")
                                 .frame(maxWidth: .infinity)
@@ -590,7 +569,10 @@ struct CupKnockoutView: View {
                 } else if showETSecondBreak {
                     VStack(spacing: 0) {
                         Button(action: {
+                            guard !isProcessingAction else { return }
+                            isProcessingAction = true
                             resumeSimulation()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { isProcessingAction = false }
                         }) {
                             Text("Continue Extra Time")
                                 .frame(maxWidth: .infinity)
@@ -610,7 +592,10 @@ struct CupKnockoutView: View {
                         VStack(spacing: 0) {
                             if !matchDone {
                                 Button(action: {
+                                    guard !isProcessingAction else { return }
+                                    isProcessingAction = true
                                     skipToResult()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { isProcessingAction = false }
                                 }) {
                                     Text("Skip to Result")
                                         .frame(maxWidth: .infinity)
@@ -624,17 +609,22 @@ struct CupKnockoutView: View {
                                 .padding(.bottom, 30)
                             } else {
                                 Button(action: {
+                                    guard !isProcessingAction else { return }
+                                    isProcessingAction = true
                                     let legs = maxLegs[min(currentRoundIndex, maxLegs.count - 1)]
                                     if legs > 1 && currentLegIndex == 0 {
                                         currentLegIndex = 1
                                         withAnimation { phase = .legBreak }
+                                    } else if needsPenaltyShootout {
+                                        beginPenaltyShootout()
                                     } else {
                                         updatePlayerMatchup()
                                         withAnimation { phase = .showingResults }
                                     }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { isProcessingAction = false }
                                 }) {
                                     Text(currentLegIndex < maxLegs[min(currentRoundIndex, maxLegs.count - 1)] - 1
-                                         ? "Continue to Second Leg" : "Continue to Penalties")
+                                         ? "Continue to Second Leg" : (needsPenaltyShootout ? "Continue to Penalties" : "Continue"))
                                         .frame(maxWidth: .infinity)
                                         .font(.headline.weight(.bold))
                                 }
@@ -729,7 +719,7 @@ struct CupKnockoutView: View {
 
     // MARK: - Scoreboard
 
-private var scoreboard: AnyView {
+    private var scoreboard: AnyView {
         let isLeg2 = currentLegIndex == 1
         guard let opp = opponent else { return AnyView(EmptyView()) }
 
@@ -781,11 +771,9 @@ private var scoreboard: AnyView {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
-)
+        )
     }
 
-    /// Full-screen goal celebration: soccer ball, the scoring team, the updated
-    /// score, and a YOU/OPPONENT badge coloured to show whose team scored.
     private func goalPopupView(_ info: GoalPopupInfo) -> some View {
         VStack(spacing: 10) {
             Image(systemName: "soccerball")
@@ -804,13 +792,6 @@ private var scoreboard: AnyView {
                 Text("\(info.awayScore)").font(.system(size: 48, weight: .black))
             }
             .foregroundColor(.white)
-        /*    Text(info.isPlayer ? "YOUR TEAM" : "OPPONENT")
-                .font(.caption.weight(.heavy))
-                .foregroundColor(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .background(info.isPlayer ? Color.green : Color.red)
-                .clipShape(Capsule()) */
         }
         .padding(30)
         .background(
@@ -820,9 +801,6 @@ private var scoreboard: AnyView {
         )
     }
 
-    /// Updates the live goal popup for a goal just shown in the playback, computing
-    /// the new scoreline with the home team's score on the left and the away team's
-    /// on the right, matching the sides used by the scoreboard.
     private func showGoalPopup(_ goal: GoalEvent, allGoals: [GoalEvent], leg: SimulatedKnockoutLeg) {
         let isPlayer = goal.teamId == playerTeamId
         let hTeam = currentLegIndex == 0 ? playerTeam : (opponent ?? playerTeam)
@@ -854,12 +832,6 @@ private var scoreboard: AnyView {
         .frame(maxWidth: .infinity)
     }
 
-    /// Advances the match clock one minute at a time, revealing goals and cards as
-    /// they happen, generating commentary, and pausing at half-time (45'), extra-time
-    /// break (105'), and after each user goal when managerial decisions are enabled.
-    /// - Parameters:
-    ///   - leg: The pre-simulated leg being revealed.
-    ///   - id: Token guarding against stale async ticks after a restart.
     private func simulateMinuteByMinute(leg: SimulatedKnockoutLeg, id: Int) {
         let allGoalEvents = (leg.goals + leg.etGoals).sorted { $0.minute < $1.minute }
         var goalIdx = shownGoals.count
@@ -875,7 +847,6 @@ private var scoreboard: AnyView {
             }
             currentMinute += 1
 
-            // Generate random commentary events every 3-7 minutes
             if currentMinute > lastCommentaryMinute + 2 && currentMinute < maxMinute && currentMinute != 45 {
                 let chance = 0.15 + (allGoalEvents.count > goalIdx ? 0.10 : 0.0)
                 if Double.random(in: 0...1) < chance {
@@ -889,7 +860,6 @@ private var scoreboard: AnyView {
                 }
             }
 
-            // Generate build-up commentary 1-2 minutes before the next goal
             if goalIdx < allGoalEvents.count {
                 let nextGoal = allGoalEvents[goalIdx]
                 let gap = nextGoal.minute - currentMinute
@@ -904,14 +874,12 @@ private var scoreboard: AnyView {
                 }
             }
 
-            // Show cards
             while cardIdx < allCardEvents.count && allCardEvents[cardIdx].minute <= currentMinute {
                 let card = allCardEvents[cardIdx]
                 commentaryEvents.append((card.minute, KnockoutCommentary.cardDescription(card), card.teamId))
                 cardIdx += 1
             }
 
-            // Show goals
             while goalIdx < allGoalEvents.count && allGoalEvents[goalIdx].minute <= currentMinute {
                 let goal = allGoalEvents[goalIdx]
                 withAnimation(.easeIn(duration: 0.3)) {
@@ -942,14 +910,13 @@ private var scoreboard: AnyView {
 
             let effectiveSpeed: Double
             switch simulationSpeed {
-            case 1.0:  effectiveSpeed = 0.5    // 1x: twice as slow as before
-            case 2.0:  effectiveSpeed = 1.0    // 2x: what old 1x was
-            default:   effectiveSpeed = 3.0    // 3x: unchanged
+            case 1.0:  effectiveSpeed = 0.5
+            case 2.0:  effectiveSpeed = 1.0
+            default:   effectiveSpeed = 3.0
             }
             let speedMultiplier = 1.0 / effectiveSpeed
             let d: Int
             if goalPopup != nil {
-                // Hold a moment longer so the goal celebration is visible.
                 d = Int(1500.0 * speedMultiplier)
             } else {
                 let nextGoalMin = goalIdx < allGoalEvents.count ? allGoalEvents[goalIdx].minute : Int.max
@@ -981,8 +948,6 @@ private var scoreboard: AnyView {
 
     // MARK: - Penalty Shootout
 
-    /// True when the current leg is tied and must be settled by penalties: a single-leg
-    /// final that finished level, or a second leg whose aggregate is level.
     private var needsPenaltyShootout: Bool {
         guard let leg = currentLegData else { return false }
         let legs = maxLegs[min(currentRoundIndex, maxLegs.count - 1)]
@@ -994,8 +959,6 @@ private var scoreboard: AnyView {
         return playerTotal == oppTotal
     }
 
-    /// Starts a penalty shootout. With playable penalties enabled the user takes
-    /// kicks interactively; otherwise the shootout is simulated and shown as a popup.
     private func beginPenaltyShootout() {
         var leg = currentLegData
         if playablePenalties {
@@ -1028,33 +991,26 @@ private var scoreboard: AnyView {
 
     // MARK: - Playable Shootout Turns
 
-    /// True when the user's team is listed as home in the current leg.
     private var isUserHome: Bool {
         guard let leg = currentLegData else { return false }
         return leg.homeTeam.id == playerTeamId
     }
 
-    /// Home team is kicking when an even number of kicks have been taken.
     private var isHomeTurn: Bool { penaltyKicks.count % 2 == 0 }
-    /// Whether it is the user's turn based on home/away rotation and their team side.
     private var isUserTurn: Bool { isHomeTurn == isUserHome }
 
-    /// Shooter order for the home side of the shootout.
     private var homeShooters: [String] {
         isUserHome ? orderedUserShooters : orderedOpponentShooters
     }
 
-    /// Shooter order for the away side of the shootout.
     private var awayShooters: [String] {
         isUserHome ? orderedOpponentShooters : orderedUserShooters
     }
 
-    /// The user's shooter order (starters then substitutes) with realistic penalty positions.
     private var orderedUserShooters: [String] {
         SimulatedKnockoutLeg.orderedShooters(hPlayerNames, substitutes: userSubstituteNames, positionFor: SimulatedKnockoutLeg.position(for:))
     }
 
-    /// The opponent's shooter order based on their squad's penalty positions.
     private var orderedOpponentShooters: [String] {
         SimulatedKnockoutLeg.orderedShooters(aPlayerNames, positionFor: SimulatedKnockoutLeg.position(for:))
     }
@@ -1064,14 +1020,12 @@ private var scoreboard: AnyView {
 
     private var opponentName: String { opponent?.name ?? "Opponent" }
 
-    /// The user's current shooter for the active kick round.
     private var currentUserShooter: String {
         let idx = penaltyKicks.count / 2
         let squad = orderedUserShooters
         return squad.isEmpty ? "Player \(idx + 1)" : squad[idx % squad.count]
     }
 
-    /// True once the shootout cannot be caught, even if all remaining kicks score.
     private var penaltyShootoutDecided: Bool {
         let h = penaltyHomeScore
         let a = penaltyAwayScore
@@ -1082,8 +1036,6 @@ private var scoreboard: AnyView {
         return abs(h - a) > remaining
     }
 
-    /// Advances playable shootout turn-taking: ends the shootout if decided,
-    /// otherwise presents the kick popup for the user's turn or the CPU's turn.
     private func advancePenaltyTurn() {
         guard penaltyActive else { return }
         if penaltyShootoutDecided {
@@ -1095,7 +1047,6 @@ private var scoreboard: AnyView {
         withAnimation { showPenaltyPopup = true }
     }
 
-    /// Records a kick (user or CPU) and advances to the next turn.
     private func handleKick(scored: Bool) {
         guard penaltyActive else { return }
         appendPenaltyKick(scored: scored)
@@ -1103,7 +1054,6 @@ private var scoreboard: AnyView {
         advancePenaltyTurn()
     }
 
-    /// Appends a kick record to the shootout using the correct home/away rotation.
     private func appendPenaltyKick(scored: Bool) {
         let isHome = penaltyKicks.count % 2 == 0
         let round = penaltyKicks.count / 2 + 1
@@ -1112,8 +1062,6 @@ private var scoreboard: AnyView {
         penaltyKicks.append(PenaltyKick(teamIsHome: isHome, shooter: shooter, scored: scored, round: round))
     }
 
-    /// Ends the shootout: writes final penalty results back into the leg, resolves the
-    /// aggregate tiebreaker, and moves on to the second leg or the results screen.
     private func finishPenaltyShootout() {
         showPenaltyPopup = false
         penaltyActive = false
@@ -1196,7 +1144,6 @@ private var scoreboard: AnyView {
 
     // MARK: - Leg Break
 
-    /// Between-legs screen showing leg 1 score; continuing starts leg 2.
     private var legBreakView: some View {
         KnockoutLegBreakView(
             playerTeam: playerTeam,
@@ -1209,8 +1156,6 @@ private var scoreboard: AnyView {
 
     // MARK: - Results
 
-    /// Stores the player's final matchup results and winner in `allMatchups` for the
-    /// results screen, using aggregate goals or penalty shootout for ties.
     private func updatePlayerMatchup() {
         goalPopup = nil
         goalFlashId = nil
@@ -1218,10 +1163,33 @@ private var scoreboard: AnyView {
         guard let teamB = opponent else { return }
         let isFinal = currentRoundIndex >= 4
 
-        if isFinal, let l1 = leg1 {
-            let winner: CupTeam? = l1.totalHomeScore > l1.totalAwayScore ? teamA
-                : l1.totalAwayScore > l1.totalHomeScore ? teamB
-                : l1.penaltyHome > l1.penaltyAway ? teamA : teamB
+        if isFinal, var l1 = leg1 {
+            let winner: CupTeam?
+            if l1.totalHomeScore > l1.totalAwayScore {
+                winner = teamA
+            } else if l1.totalAwayScore > l1.totalHomeScore {
+                winner = teamB
+            } else if l1.penaltyHome > l1.penaltyAway {
+                winner = teamA
+            } else if l1.penaltyAway > l1.penaltyHome {
+                winner = teamB
+            } else {
+                if l1.neededPenalties && l1.penaltyKicks.isEmpty {
+                    let isPlayerHome = l1.homeTeam.id == playerTeamId
+                    let hNames = isPlayerHome ? orderedUserShooters : orderedOpponentShooters
+                    let aNames = isPlayerHome ? orderedOpponentShooters : orderedUserShooters
+                    let hSubs = isPlayerHome ? userSubstituteNames : []
+                    let aSubs = isPlayerHome ? [] : userSubstituteNames
+                    let shootout = SimulatedKnockoutLeg.generatePenaltyShootout(homePlayers: hNames, awayPlayers: aNames, homeSubstitutes: hSubs, awaySubstitutes: aSubs)
+                    l1.penaltyHome = shootout.home
+                    l1.penaltyAway = shootout.away
+                    l1.penaltyKicks = shootout.kicks
+                    leg1 = l1
+                    winner = l1.penaltyHome > l1.penaltyAway ? teamA : teamB
+                } else {
+                    winner = Bool.random() ? teamA : teamB
+                }
+            }
             if let idx = allMatchups.firstIndex(where: { $0.isPlayerMatch }) {
                 allMatchups[idx] = RoundMatchup(
                     teamA: teamA, teamB: teamB,
@@ -1230,7 +1198,7 @@ private var scoreboard: AnyView {
                     winner: winner, isPlayerMatch: true
                 )
             }
-        } else if let l1 = leg1, let l2 = leg2 {
+        } else if let l1 = leg1, var l2 = leg2 {
             let totalA = l1.totalHomeScore + l2.totalAwayScore
             let totalB = l1.totalAwayScore + l2.totalHomeScore
             let winner: CupTeam?
@@ -1241,8 +1209,20 @@ private var scoreboard: AnyView {
                 winner = teamB
                 aggregateTiebreakerWon = false
             } else {
+                if l2.neededPenalties && l2.penaltyKicks.isEmpty {
+                    let isPlayerHome = l2.homeTeam.id == playerTeamId
+                    let hNames = isPlayerHome ? orderedUserShooters : orderedOpponentShooters
+                    let aNames = isPlayerHome ? orderedOpponentShooters : orderedUserShooters
+                    let hSubs = isPlayerHome ? userSubstituteNames : []
+                    let aSubs = isPlayerHome ? [] : userSubstituteNames
+                    let shootout = SimulatedKnockoutLeg.generatePenaltyShootout(homePlayers: hNames, awayPlayers: aNames, homeSubstitutes: hSubs, awaySubstitutes: aSubs)
+                    l2.penaltyHome = shootout.home
+                    l2.penaltyAway = shootout.away
+                    l2.penaltyKicks = shootout.kicks
+                    leg2 = l2
+                }
                 let tiebreakerWon = l2.neededPenalties ? l2.penaltyAway > l2.penaltyHome
-                    : l1.penaltyAway > l1.penaltyHome
+                    : (l1.penaltyAway > l1.penaltyHome)
                 aggregateTiebreakerWon = tiebreakerWon
                 winner = tiebreakerWon ? teamA : teamB
             }
@@ -1258,29 +1238,24 @@ private var scoreboard: AnyView {
         resolveOutcome()
     }
 
-    /// Marks the player as eliminated, champion, or still alive based on the
-    /// aggregate/penalty result of the just-finished round. Called
-    /// deterministically before the results screen appears so the outcome is
-    /// always recorded (fixing a missing end-of-cup banner on early exits).
     private func resolveOutcome() {
         let isFinal = currentRoundIndex >= 4
         if isFinal {
             if playerAdvanced {
                 isChampion = true
+                eliminated = false
             } else {
                 isChampion = false
                 eliminated = true
                 eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
             }
         } else if !playerAdvanced {
+            isChampion = false
             eliminated = true
             eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
         }
     }
 
-    /// Round result recap: final/two-leg result views plus the full bracket. Offers
-    /// "Continue to Next Round" if the player advanced, otherwise reports elimination.
-    /// Marks champion status after the Final.
     private var resultsView: some View {
         let isFinal = currentRoundIndex >= 4
         return VStack(spacing: 0) {
@@ -1315,9 +1290,10 @@ private var scoreboard: AnyView {
             }
 
             VStack(spacing: 0) {
-               // Divider()
                 if !eliminated && !isChampion && playerAdvanced {
                     Button(action: {
+                        guard !isProcessingAction else { return }
+                        isProcessingAction = true
                         currentLegIndex = 0
                         leg1 = nil
                         leg2 = nil
@@ -1325,6 +1301,7 @@ private var scoreboard: AnyView {
                         currentRoundIndex += 1
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             self.setupRound()
+                            isProcessingAction = false
                         }
                     }) {
                         Text("Continue to Next Round")
@@ -1336,59 +1313,35 @@ private var scoreboard: AnyView {
                     .controlSize(.large)
                     .tint(.green)
                     .padding(.horizontal)
-                  //  .padding(.vertical, 8)
                     .padding(.bottom, 30)
                 } else {
-                    // Auto-advance to end view
-                    EmptyView()
+                    Button(action: {
+                        guard !isProcessingAction else { return }
+                        isProcessingAction = true
+                        onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
+                    }) {
+                        Text("Continue to Season Summary")
+                            .frame(maxWidth: .infinity)
+                            .font(.headline.weight(.bold))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: 10))
+                    .controlSize(.large)
+                    .tint(.green)
+                    .padding(.horizontal)
+                    .padding(.bottom, 30)
                 }
-            }
-         //   .background(Color(.systemGray6))
-        }
-        .onAppear {
-            if !playerAdvanced {
-                eliminated = true
-                eliminatedIn = knockoutRoundNames[min(currentRoundIndex, 4)]
-                isChampion = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    withAnimation { phase = .end }
-                }
-            } else if currentRoundIndex >= 4 {
-                isChampion = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    withAnimation { phase = .end }
-                }
-            }
-        }
-    }
-
-    // MARK: - End
-
-    /// Final end-of-campaign screen shown after elimination or a championship.
-    private var endView: some View {
-        KnockoutEndView(
-            competitionType: competitionType,
-            isChampion: isChampion,
-            eliminated: eliminated,
-            eliminatedIn: eliminatedIn,
-            onComplete: { onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats()) }
-        )
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
             }
         }
     }
 
     // MARK: - Logic
 
-    /// Skips forward when a round has no player matchup: crowns the player champion
-    /// after the Final, otherwise advances to the next round's setup.
     private func advanceOrEnd() {
         let isFinal = currentRoundIndex >= 4 || currentRoundName == "Final"
         if isFinal {
             isChampion = true
-            phase = .end
+            onComplete(eliminated, eliminatedIn, isChampion, computePlayerStats())
         } else {
             currentRoundIndex += 1
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -1397,9 +1350,6 @@ private var scoreboard: AnyView {
         }
     }
 
-    /// Tallys the user's goals (and assists) across all played legs into per-player
-    /// season stats, sorted by goals then assists.
-    /// - Returns: Knockout-phase player stats to merge with the league phase.
     private func computePlayerStats() -> [PlayerSeasonStats] {
         var statDict: [String: PlayerSeasonStats] = [:]
         for name in userPlayerNames {
@@ -1420,8 +1370,6 @@ private var scoreboard: AnyView {
         return statDict.values.sorted { $0.goals > $1.goals || ($0.goals == $1.goals && $0.assists > $1.assists) }
     }
 
-    /// Whether the player won the current round (aggregate lead, or penalties in the
-    /// final / aggregate ties).
     private var playerAdvanced: Bool {
         let isFinal = currentRoundIndex >= 4
         if isFinal {
@@ -1444,17 +1392,13 @@ private var scoreboard: AnyView {
         knockoutRoundNames[min(currentRoundIndex, 4)]
     }
     
-    /// Simulation speed: 1.0 = normal, 2.0 = fast, 3.0 = fastest
     @AppStorage("simulationSpeed") private var simulationSpeed: Double = 1.0
     
-    /// Toggles the simulation speed: 1x, 2x, or 3x
     private func fastModeToggle(_ speed: Double) {
         simulationSpeed = speed
         currentSpeed = speed
     }
 
-    /// Instantly finishes the current match by jumping to the final minute
-    /// and revealing all goals at once.
     private func skipToResult() {
         currentMinute = maxMinute
         shownGoals = currentGoals

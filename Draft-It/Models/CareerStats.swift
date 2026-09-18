@@ -213,9 +213,12 @@ struct CareerStats: Codable {
         DraftHistory.clearAll()
     }
 
-    /// Encodes and stores these stats under the "careerStats" key.
+    /// Encodes and stores these stats under the "careerStats" key and reports to Game Center.
     func save() {
         guard let data = try? JSONEncoder().encode(self) else { return }
         UserDefaults.standard.set(data, forKey: "careerStats")
+        Task { @MainActor in
+            GameCenterManager.shared.reportCareerStats(self)
+        }
     }
 }

@@ -77,23 +77,17 @@ enum GameMode: String, CaseIterable, Codable {
     /// OVR boost applied to AI opponents (positive = harder).
     var opponentBoost: Int {
         switch self {
-        case .easy: return -3
+        case .easy: return -4
         case .normal: return 0
         case .hard: return 2
-        case .extreme: return 4
+        case .extreme: return 5
         case .mode38, .positionsFirst, .transferBudget, .onePerClub, .noPremierLeague: return 0
         }
     }
 
     /// OVR boost applied to the player's team (positive = easier).
     var playerBoost: Int {
-        switch self {
-        case .easy: return 3
-        case .normal: return 0
-        case .hard: return -2
-        case .extreme: return -4
-        case .mode38, .positionsFirst, .transferBudget, .onePerClub, .noPremierLeague: return 0
-        }
+        0
     }
 }
 

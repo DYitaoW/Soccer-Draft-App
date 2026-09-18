@@ -1,8 +1,8 @@
 /// Soccer_DraftApp.swift
 ///
 /// The app entry point. Sets up the root SwiftUI scene, hosts ContentView,
-/// and applies the user's preferred color scheme (light, dark, or system),
-/// reacting to changes in the UserDefaults "colorSchemeMode" key.
+/// authenticates Game Center, and applies the user's preferred color scheme
+/// (light, dark, or system), reacting to changes in the UserDefaults "colorSchemeMode" key.
 import SwiftUI
 
 @main
@@ -19,6 +19,9 @@ struct Soccer_DraftApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(colorScheme)
+                .onAppear {
+                    GameCenterManager.shared.authenticateLocalPlayer()
+                }
                 .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
                     let newValue = UserDefaults.standard.string(forKey: "colorSchemeMode") ?? "system"
                     if newValue != colorSchemeMode {

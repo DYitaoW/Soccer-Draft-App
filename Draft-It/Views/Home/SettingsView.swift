@@ -78,10 +78,6 @@ struct SettingsView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
 
-                //Divider()
-                  //  .padding(.horizontal, 20)
-                
-
                 HStack {
                     Text("Midseason Transfers")
                         .font(.headline)
@@ -90,7 +86,6 @@ struct SettingsView: View {
                         .labelsHidden()
                 }
                 .padding(.horizontal, 20)
-                
 
                 Text("Enable anywhere from 1-3 transfers midseason")
                     .font(.caption)
@@ -198,14 +193,23 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 20)
 
-                Button("Reset All Stats", role: .destructive) {
-                    showResetConfirm = true
+                HStack(spacing: 12) {
+                    Button(action: {
+                        GameCenterManager.shared.presentDashboard()
+                    }) {
+                        Label("Game Center", systemImage: "gamecontroller.fill")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+
+                    Button("Reset All Stats", role: .destructive) {
+                        showResetConfirm = true
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .buttonStyle(.bordered)
                 }
-                .font(.headline.weight(.bold))
-                .buttonStyle(.borderedProminent)
-                //.controlSize(.large)
-                .padding(.top, 20)
-                .buttonBorderShape(.roundedRectangle(radius: 10))
+                .padding(.top, 16)
 
                 Divider()
                     .padding(.horizontal, 20)
@@ -250,11 +254,7 @@ struct SettingsView: View {
                 stats = .load()
             }
         } message: {
-            Text("This will permanently erase all career stats, achievements, and past game history.")
+            Text("Are you sure you want to reset all saved career stats? This action cannot be undone.")
         }
     }
-}
-
-#Preview {
-    SettingsView(onDismiss: {})
 }
